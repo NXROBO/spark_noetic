@@ -1,0 +1,53 @@
+<!--spark camera slam-->
+<!--SPARK技术讨论与反馈群：8346256-->
+<launch>
+  	<!-- Arguments -->
+	<arg name="depthtolaser"	default="/camera/depth/image_rect_raw"/>
+  	<arg name="slam_methods" default="gmapping" doc="slam type [gmapping, cartographer, hector, karto, frontier_exploration]"/>
+  	<arg name="camera_types" default="astrapro" doc="camera type [astrapro, astra, d435]"/>
+  	<arg name="configuration_basename" default="spark_lds_2d.lua"/>
+  	<arg name="open_rviz" default="true"/>
+
+	<!-- spark底盘驱动，机器人描述,底盘,相机 -->
+	<include file="$(find spark_bringup)/launch/driver_bringup.launch">
+		<arg name="camera_types" 	value="$(arg camera_types)"/>
+	</include>
+
+  	<!-- Run the depthimage_to_laserscan node -->
+	<include file="$(find spark_slam)/launch/pointcloud2scan.launch"/>
+  	<!--
+  	<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan" output="screen">
+    
+
+    		<remap from="image" to="$(arg depthtolaser)" />
+
+    		
+    		<remap from="camera_info" to="/camera/depth/camera_info" />
+
+    		<remap from="scan" to="/scan" />
+    		<param name="output_frame_id" value="camera_depth_frame" />
+
+    		
+    		<param name="scan_height" value="50" />
+  	</node>
+	-->
+  	<!-- SLAM: Gmapping, Cartographer, Hector, Karto, Frontier_exploration, RTAB-Map -->
+  	<include file="$(find spark_slam)/launch/spark_$(arg slam_methods).launch">
+    	<!--arg name="model" value="$(arg model)"/-->
+    		<arg name="configuration_basename" value="$(arg configuration_basename)"/>
+  	</include>
+
+  	<!-- rviz -->
+  	<group if="$(arg open_rviz)"> 
+		<group if="$(eval arg('camera_types')=='d435')">
+			<node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find spark_slam)/rviz/spark_$(arg slam_methods)_d435.rviz"/>
+		</group>
+		<group unless="$(eval arg('camera_types')=='d435')">
+    			<node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find spark_slam)/rviz/spark_$(arg slam_methods).rviz"/>
+		</group>
+  	</group>
+
+  	<!--创建新的终端，spark键盘控制 “wsad”分别代表“前后左右”-->
+  	<node pkg="spark_teleop" type="keyboard_control.sh" name="kc" />
+
+</launch>

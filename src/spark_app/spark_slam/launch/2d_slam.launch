@@ -1,0 +1,37 @@
+<!--spark 2d slam-->
+<!--SPARK技术讨论与反馈群：8346256-->
+<launch>
+  	<!-- Arguments -->
+	<arg name="camera_types"	default="astrapro"/>
+  	<arg name="slam_methods" default="gmapping" doc="slam type [gmapping, cartographer, hector, karto, frontier_exploration]"/>
+  	<arg name="configuration_basename" default="spark_lds_2d.lua"/>
+  	<arg name="open_rviz" default="true"/>
+
+	<!-- spark底盘驱动，机器人描述,底盘,相机 -->
+	<include file="$(find spark_bringup)/launch/driver_bringup.launch">
+		<arg name="start_camera"	value="false"/>
+		<arg name="camera_types"	value="$(arg camera_types)"/>
+	</include>
+
+ 	<!-- 3D sensor -->
+  	<arg name="3d_sensor" default="3i_lidar"/>  
+    		<include file="$(find iiiroboticslidar2)/launch/3iroboticslidar2.launch">
+  	</include>
+
+  	<!-- SLAM: Gmapping, Cartographer, Hector, Karto, Frontier_exploration-->
+  	<include file="$(find spark_slam)/launch/spark_$(arg slam_methods).launch">
+    		<arg name="configuration_basename" value="$(arg configuration_basename)"/>
+  	</include>
+	<!--<include file="$(find exploration_server)/launch/exploration.launch"/> -->
+  	
+  	<!-- rviz -->
+  	<group if="$(arg open_rviz)"> 
+		<group if="$(eval arg('camera_types')=='d435')">
+			<node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find spark_slam)/rviz/spark_$(arg slam_methods)_d435.rviz"/>
+		</group>
+		<group unless="$(eval arg('camera_types')=='d435')">
+    			<node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find spark_slam)/rviz/spark_$(arg slam_methods).rviz"/>
+		</group>
+  	</group>
+
+</launch>

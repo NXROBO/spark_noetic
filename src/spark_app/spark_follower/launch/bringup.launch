@@ -1,0 +1,23 @@
+<!--
+  The nxrobo people (or whatever) follower nodelet.   
+ -->
+
+<launch>
+	<!-- 启动哪种摄像机 -->
+	<arg name="camera_type_tel" default="astrapro" doc="camera type [astrapro, astra, d435...]"/>
+
+	<!-- spark底盘驱动，机器人描述,底盘,相机 -->
+	<include file="$(find spark_bringup)/launch/driver_bringup.launch">
+		<arg name="camera_types"	value="$(arg camera_type_tel)"/>
+	</include>
+
+	<!-- -->
+	<include file="$(find spark_follower)/launch/nxfollower_bringup_nodelet.launch">
+		<arg name="camera_types"	value="$(arg camera_type_tel)"/>
+	</include>
+
+	<!--在rviz显示-->
+  	<!--<arg name="rvizconfig" default="$(find spark_follower)/rviz/follow.rviz" />-->
+	<arg name="rvizconfig" default="$(find spark_follower)/rviz/follow_$(arg camera_type_tel).rviz" />
+  	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true"/>
+</launch>

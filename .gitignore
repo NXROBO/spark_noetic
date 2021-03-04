@@ -1,0 +1,26 @@
+*~
+*.swp
+*.user
+*.autosave
+CMakeLists.txt.user
+qtcreator-*
+*.user
+*.bat
+*.d
+*.g
+*.ldata
+*.log
+intel
+.catkin_workspace
+
+>>>>>>> fsm_ngh_beta
+build-simple_goals-Desktop-Default/
+build-*/
+build
+devel
+install
+*.pyc
+*.orig
+.tmp
+/spark_tutorials/spark_iflytek/msc/res/asr/GrmBuilld/
+tensorflow
