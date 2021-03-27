@@ -695,16 +695,25 @@ spark_dock(){
 }
 
 
-spark_test(){
-
-	echo -e "${Info}" 
-	echo -e "${Info}      SPARK test" 
+spark_test_mode(){
 	PROJECTPATH=$(cd `dirname $0`; pwd)
-	source ${PROJECTPATH}/devel/setup.bash
-
-	echo && stty erase ^? && read -p "按回车键（Enter）开始：" 
-	print_command "roslaunch spark_test turn_test.launch"
-	roslaunch spark_test turn_test.launch
+	source ${PROJECTPATH}/devel/setup.bash	
+	echo -e "${Info}老化测试程序，请将机器人放在一个50X50CM的方格中间进行测试，请选择：
+	1.执行5分钟的检测功能；
+        2.执行老化检测功能，直至断电。"
+        echo -e "${Info}退出请输入：Ctrl + c " 
+	echo && stty erase ^? && read -p "请选择 1 或 2 ：" chnum
+ 	case "$chnum" in
+		1)
+		roslaunch spark_test all_run_test_st.launch camera_type_tel:=${CAMERATYPE}	
+		;;
+		2)
+		roslaunch spark_test all_run_test.launch camera_type_tel:=${CAMERATYPE}	
+		;;
+		*)
+		echo -e "${Error} 退出!"	
+		;;
+	esac
 }
 
 #让SPARK使用深度摄像头绘制地图
@@ -1003,7 +1012,7 @@ case "$num" in
 	spark_dock
 	;;
 	98)
-	spark_test
+	spark_test_mode
 	;;
 	*)
 	echo -e "${Error} 请输入正确的数字 "

@@ -1,11 +1,11 @@
 #include "ros/ros.h"
-
+#include <boost/function.hpp>
+#include <boost/thread/thread.hpp>
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
 #include <sensor_msgs/Image.h>
 #include <geometry_msgs/Twist.h>
-#include <boost/function.hpp>
-#include <boost/thread/thread.hpp>
+
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 
 class MotionTest
@@ -33,11 +33,9 @@ public:
   bool testMotion()
   {
     ros::Rate rate(10);
-    while(ros::ok)
-    {
     double prev_sec = ros::Time().now().toSec();
     int sec = 10;
-    while (ros::ok)
+    while (1)
     {
       //逆时针旋转
       if (ros::Time().now().toSec() - prev_sec > sec)
@@ -47,7 +45,7 @@ public:
       rate.sleep();
     }
     prev_sec = ros::Time().now().toSec();
-    while (ros::ok)
+    while (1)
     {
       //顺时针旋转
       if (ros::Time().now().toSec() - prev_sec > sec)
@@ -57,7 +55,7 @@ public:
       rate.sleep();
     }
     prev_sec = ros::Time().now().toSec();
-/*    while (1)
+    while (1)
     {
       //逆时针同心圆旋转
       if (ros::Time().now().toSec() - prev_sec > sec)
@@ -76,7 +74,6 @@ public:
       ROS_INFO("shunshizhen tongxinyuan");
       testTurnBody(0.2, -1, 10);
       rate.sleep();
-    }*/
     }
   }
 

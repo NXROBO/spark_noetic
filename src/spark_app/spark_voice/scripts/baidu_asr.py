@@ -8,9 +8,9 @@ from threading import Thread, Event
 from lib import Microphone,AipSpeech
 
 """ 你的 APPID AK SK """
-APP_ID = '10475584'
-API_KEY = 'm2zeD2S8ft8z6Y0oUblsIZhy'
-SECRET_KEY = 'Y226Y4YCRzpYXy3E3MTG0xxyqRGZYG50'
+APP_ID = '23797700'
+API_KEY = 'dK8rz5DG9pPi90cgQVtx1ddn'
+SECRET_KEY = 'X1lzayj5RQwfkoLHXHd5DALRvFZpjhBP'
 
 def main():
     #logging.basicConfig(level=logging.DEBUG)

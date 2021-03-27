@@ -9,8 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   pcl_ros
-  tf
   spark_base
+  spark_carry_object
 )
 
 
@@ -18,12 +18,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## catkin specific configuration ##
 ###################################=
 catkin_package(
-  LIBRARIES
-  CATKIN_DEPENDS roscpp rospy std_msgs tf
-  DEPENDS system_lib
-)
-include_directories(include
-  ${catkin_INCLUDE_DIRS}
+#  INCLUDE_DIRS include
+#  LIBRARIES spark_test
+#  CATKIN_DEPENDS roscpp rospy std_msgs spark_base
+#  DEPENDS system_lib
 )
 
 ###########
@@ -52,6 +50,13 @@ add_dependencies(spark_test_topic_node
 target_link_libraries(spark_test_topic_node ${catkin_LIBRARIES})
 
 
+add_executable(spark_turn_left_right_node src/spark_turn_left_right.cpp)
+add_dependencies(spark_turn_left_right_node 
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} 
+  ${catkin_EXPORTED_TARGETS}
+  ${PROJECT_NAME}_generate_messages_cpp)
+target_link_libraries(spark_turn_left_right_node ${catkin_LIBRARIES})
+
 add_executable(spark_test_motion_node src/spark_test_motion.cpp)
 add_dependencies(spark_test_motion_node 
   ${${PROJECT_NAME}_EXPORTED_TARGETS} 
@@ -60,6 +65,12 @@ add_dependencies(spark_test_motion_node
 target_link_libraries(spark_test_motion_node ${catkin_LIBRARIES})
 
 
+add_executable(spark_turn_left_right_st_node src/spark_turn_left_right_st.cpp)
+add_dependencies(spark_turn_left_right_st_node 
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} 
+  ${catkin_EXPORTED_TARGETS}
+  ${PROJECT_NAME}_generate_messages_cpp)
+target_link_libraries(spark_turn_left_right_st_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##
