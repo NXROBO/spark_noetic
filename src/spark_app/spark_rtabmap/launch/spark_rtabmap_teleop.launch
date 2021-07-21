@@ -1,7 +1,7 @@
 <!--spark rtabmap-->
 <!--SPARK技术讨论与反馈群：8346256-->
 <launch>
-	<arg name="point2laser" default="/camera/depth/points"/>
+	<arg name="point2laser" default="/camera/depth_registered/points"/>
 	<!-- camera -->
 	<arg name="camera_type_tel" default="" doc="camera type [astrapro, astra]" />
 	<!-- spark base driver -->

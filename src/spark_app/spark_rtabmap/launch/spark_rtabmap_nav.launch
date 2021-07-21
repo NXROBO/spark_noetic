@@ -3,7 +3,7 @@
 <launch>
 	<!-- camera -->
 	<arg name="camera_type_tel" default="" doc="camera type [astrapro, astra]"/>
-	<arg name="depthtolaser"	default="/camera/depth/image_rect_raw"/>
+	<arg name="point2laser" default="/camera/depth_registered/points"/>
 	
 	<!-- spark底盘驱动，机器人描述,底盘,相机 -->
 	<include file="$(find spark_bringup)/launch/driver_bringup.launch">
@@ -12,20 +12,9 @@
 	</include>
 
 
-  	<!-- Run the depthimage_to_laserscan node -->
-  	<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan" output="screen">
-    
-    		<!--<remap from="image" to="/camera/depth/image_raw" />-->
-    		<remap from="image" to="$(arg depthtolaser)" />
-
-    		<!--<remap from="camera_info" to="/camera/depth/camera_info" />-->
-    		<remap from="camera_info" to="/camera/depth/camera_info" />
-
-    		<remap from="scan" to="/scan" />
-    		<param name="output_frame_id" value="camera_depth_frame" />
-
-    		<param name="scan_height" value="20" />
-  	</node>
+  	<include file="$(find spark_slam)/launch/pointcloud2scan.launch">
+		<arg name="point2laser"	value="$(arg point2laser)"/>
+	</include>
 
 
   	<!-- Move base -->
