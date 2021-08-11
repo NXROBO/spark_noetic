@@ -9,7 +9,7 @@ export PATH
 #    SPARK技术讨论与反馈QQ群：6646169  8346256
 #=================================================
 
-
+GAME_ENABLE="no"
 sh_ver="2.0"
 filepath=$(cd "$(dirname "$0")"; pwd)
 Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Yellow_background_prefix="\033[43;37m" && Font_color_suffix="\033[0m" && Yellow_font_prefix="\e[1;33m" && Blue_font_prefix="\e[0;34m"
@@ -25,6 +25,20 @@ OSDescription=$(lsb_release -d --short)
 OSArch=$(uname -m)
 calibra_default="${filepath}/../.ros/camera_info"
 
+
+calibration="calibration"
+color_block="color_block"
+
+TYPE_LIDAR=$(cat /opt/lidar.txt)
+echo ${TYPE_LIDAR}
+if [[ "${TYPE_LIDAR}" == "ydlidar_g2" ]]; then
+	LIDARTYPE="ydlidar_g2"
+elif [[ "${TYPE_LIDAR}" == "3iroboticslidar2" ]]; then
+	LIDARTYPE="3iroboticslidar2"
+else
+	echo "暂不支持的雷达：${TYPE_LIDAR}，使用默认的杉川雷达运行"
+	LIDARTYPE="3iroboticslidar2"
+fi
 
 #检查系统要求
 check_sys(){
@@ -48,8 +62,30 @@ check_dev(){
 	
 	#检查摄像头
 	check_camera
+	#检查雷达
+	check_lidar
 }
+#检查雷达设备
+check_lidar(){
 
+	lidar_flag=0
+
+	#检查使用哪种设备
+	if [ -n "$(lsusb -d 10c4:ea60)" ]; then
+		lidar_flag=$[$lidar_flag + 1]
+	fi
+
+
+
+	if [ $lidar_flag -ge 2 ]; then
+		echo -e "${Warn} 正在使用多个雷达设备，请退出并拔掉其中一个再使用!"
+		echo -e "${Warn} 退出请输入：Ctrl + c！"
+	elif [ $lidar_flag -eq 1 ]; then
+		echo -e "${Info} 正在使用${LIDARTYPE}雷达"
+	elif [ $lidar_flag -eq 0 ]; then
+		echo -e "${Error} 没有找到雷达，请确认雷达已正确连接！！"
+	fi	
+}
 #检查摄像头设备
 check_camera(){
 
@@ -304,8 +340,8 @@ let_robot_go(){
 	echo -e "${Info}                           " 
 	echo -e "${Info}    退出请输入：Ctrl + c    " 
 	echo && stty erase ^? && read -p "按回车键（Enter）开始：" 
-	print_command "roslaunch spark_teleop teleop.launch camera_type_tel:=${CAMERATYPE}"
-	roslaunch spark_teleop teleop.launch camera_type_tel:=${CAMERATYPE}
+	print_command "roslaunch spark_teleop teleop.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	roslaunch spark_teleop teleop.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 }
 
 
@@ -323,8 +359,8 @@ remote_control_robot(){
 	echo -e "${Info}退出请输入：Ctrl + c" 
 	echo -e "${Info}" 
 	echo && stty erase ^? && read -p "按回车键（Enter）开始：" 
-	print_command "roslaunch spark_teleop app_op.launch camera_type_tel:=${CAMERATYPE}"
-	roslaunch spark_teleop app_op.launch camera_type_tel:=${CAMERATYPE}
+	print_command "roslaunch spark_teleop app_op.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	roslaunch spark_teleop app_op.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 }
 
 #让SPARK跟着你走
@@ -399,20 +435,20 @@ cal_camera_arm(){
 	echo && stty erase ^? && read -p "按回车键（Enter）开始：" 
 	if [ $ROSVER = "kinetic" ]; then
 		echo -e "${Info}It is kinetic." 
-		print_command "roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE}"
-	  	roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE}
+		print_command "roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	  	roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 	elif [ $ROSVER = "indigo" ]; then
 		echo -e "${Info}It is indigo." 
-		print_command "roslaunch spark_carry_object spark_carry_cal_cv2.launch camera_type_tel:=${CAMERATYPE}"
-	  	roslaunch spark_carry_object spark_carry_cal_cv2.launch camera_type_tel:=${CAMERATYPE}
+		print_command "roslaunch spark_carry_object spark_carry_cal_cv2.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	  	roslaunch spark_carry_object spark_carry_cal_cv2.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 	elif [ $ROSVER = "melodic" ]; then
 		echo -e "${Info}It is melodic." 
-		print_command "roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE}"
-	  	roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE}
+		print_command "roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	  	roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 	elif [ $ROSVER = "noetic" ]; then
 		echo -e "${Info}It is melodic." 
-		print_command "roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE}"
-	  	roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE}
+		print_command "roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	  	roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 	fi
 		
 }
@@ -433,8 +469,8 @@ spark_navigation_2d(){
 	echo -e "${Info}退出请输入：Ctrl + c " 
 	echo -e "${Info}" 
 	echo && stty erase '^H' && read -p "按回车键（Enter）开始：" 
-	print_command "roslaunch spark_navigation amcl_demo_lidar_rviz.launch camera_type_tel:=${CAMERATYPE}"
-	roslaunch spark_navigation amcl_demo_lidar_rviz.launch camera_type_tel:=${CAMERATYPE}
+	print_command "roslaunch spark_navigation amcl_demo_lidar_rviz.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	roslaunch spark_navigation amcl_demo_lidar_rviz.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 }
 #让SPARK使用深度摄像头进行导航
 spark_navigation_3d(){
@@ -610,20 +646,20 @@ spark_carry_obj(){
 	echo && stty erase ^? && read -p "按回车键（Enter）开始：" 
 	if [ $ROSVER = "kinetic" ]; then
 		echo -e "${Info}It is kinetic." 
-		print_command "roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE}"
-	  	roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE}
+		print_command "roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	  	roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 	elif [ $ROSVER = "indigo" ]; then
 		echo -e "${Info}It is indigo." 
-		print_command "roslaunch spark_carry_object spark_carry_object_only_cv2.launch camera_type_tel:=${CAMERATYPE}"
-	  	roslaunch spark_carry_object spark_carry_object_only_cv2.launch camera_type_tel:=${CAMERATYPE}
+		print_command "roslaunch spark_carry_object spark_carry_object_only_cv2.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	  	roslaunch spark_carry_object spark_carry_object_only_cv2.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 	elif [ $ROSVER = "melodic" ]; then
 		echo -e "${Info}It is melodic." 
-		print_command "roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE}"
-	  	roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE}
+		print_command "roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	  	roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 	elif [ $ROSVER = "noetic" ]; then
 		echo -e "${Info}It is noetic." 
-		print_command "roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE}"
-	  	roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE}	  	
+		print_command "roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	  	roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}	
 	fi
 	
 }
@@ -672,8 +708,8 @@ spark_build_map_2d(){
 	echo -e "${Info}退出请输入：Ctrl + c        " 
 	echo -e "${Info}" 
 	echo && stty erase ^? && read -p "按回车键（Enter）开始：" 
-	print_command "roslaunch spark_slam 2d_slam_teleop.launch slam_methods_tel:=${SLAMTYPE} camera_type_tel:=${CAMERATYPE}"
-	roslaunch spark_slam 2d_slam_teleop.launch slam_methods_tel:=${SLAMTYPE} camera_type_tel:=${CAMERATYPE}
+	print_command "roslaunch spark_slam 2d_slam_teleop.launch slam_methods_tel:=${SLAMTYPE} camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	roslaunch spark_slam 2d_slam_teleop.launch slam_methods_tel:=${SLAMTYPE} camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 	
 }
 #让SPARK去充电
@@ -692,6 +728,32 @@ spark_dock(){
 		return
 	fi
 
+}
+
+
+#让SPARK夺宝奇兵比赛用示例程序
+spark_carry_game(){
+	echo -e "${Info}" 
+	echo -e "${Info}夺宝奇兵比赛用示例程序" 
+	ROSVER=`/usr/bin/rosversion -d`
+	PROJECTPATH=$(cd `dirname $0`; pwd)
+	source ${PROJECTPATH}/devel/setup.bash
+	echo -e "${Info}请选择比赛方式：
+	  ${Green_font_prefix}1.${Font_color_suffix} 手动模式
+	  ${Green_font_prefix}2.${Font_color_suffix} 自动模式
+	  ${Green_font_prefix}3.${Font_color_suffix} 退出请输入：Ctrl + c" 
+	echo && stty erase ^? && read -p "请输入数字 [1-2]：" armnum
+	case "$armnum" in
+		1)
+		roslaunch move2grasp teleop2grasp.launch camera_type_tel:=${CAMERATYPE}  lidar_type_tel:=${LIDARTYPE}
+		;;
+		2)
+		roslaunch move2grasp move2grasp.launch camera_type_tel:=${CAMERATYPE}  lidar_type_tel:=${LIDARTYPE}
+		;;
+		*)
+		echo -e "${Error} 错误，请填入正确的数字"
+		;;
+	esac	
 }
 
 
