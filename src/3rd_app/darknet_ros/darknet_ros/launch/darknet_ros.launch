@@ -24,7 +24,9 @@
     <param name="config_path"           value="$(arg yolo_config_path)" />
     <remap from="darknet_ros/detection_image"  to="$(arg output_image)" />
     <remap from="camera/rgb/image_raw" to="/camera/color/image_raw" if="$(eval arg('camera_type_tel')=='d435')"/>
-    <remap from="image" to="/camera/rgb/image_raw" unless="$(eval arg('camera_type_tel')=='d435')"/>
+    <remap from="camera/rgb/image_raw" to="/camera/rgb/image_raw" if="$(eval arg('camera_type_tel')=='astrapro')"/>
+    <remap from="camera/rgb/image_raw" to="/camera/rgb/image_raw" if="$(eval arg('camera_type_tel')=='astra')"/>
+
   </node>
 
  <!--<node name="republish" type="republish" pkg="image_transport" output="screen" 	args="compressed in:=/front_camera/image_raw raw out:=/camera/image_raw" /> -->
