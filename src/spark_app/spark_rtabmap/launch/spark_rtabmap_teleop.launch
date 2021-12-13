@@ -1,13 +1,13 @@
 <!--spark rtabmap-->
 <!--SPARK技术讨论与反馈群：8346256-->
 <launch>
-	<arg name="point2laser" default="/camera/depth_registered/points"/>
+
 	<!-- camera -->
 	<arg name="camera_type_tel" default="" doc="camera type [astrapro, astra]" />
 	<!-- spark base driver -->
 	<include file="$(find spark_rtabmap)/launch/rtab_demo.launch">
 		<arg name="camera_types"	value="$(arg camera_type_tel)" />
-		<arg name="point2laser"	value="$(arg point2laser)"/>	
+
 	</include>
 
 	<!-- rtabmap -->

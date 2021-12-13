@@ -95,17 +95,17 @@ check_camera(){
 	#检查使用哪种设备
 	if [ -n "$(lsusb -d 2bc5:0403)" ]; then
 		CAMERATYPE="astrapro"
-		depthtolaser="/camera/depth/image_rect_raw"
+
 		camera_flag=$[$camera_flag + 1]
 	fi
 	if [ -n "$(lsusb -d 2bc5:0401)" ]; then
 		CAMERATYPE="astra"
-		depthtolaser="/camera/depth/image_raw"
+
 		camera_flag=$[$camera_flag + 1]
 	fi
 	if [ -n "$(lsusb -d 8086:0b07)" ]; then
 		CAMERATYPE="d435"
-		depthtolaser="/camera/depth/image_rect_raw"
+
 		camera_flag=$[$camera_flag + 1]
 	fi
 
@@ -507,11 +507,11 @@ spark_navigation_3d(){
 	echo -e "${Info}" 
 	echo && stty erase ^? && read -p "按回车键（Enter）开始：" 
 	if [[ "${SLAMTYPE}" == "2d" ]]; then
-		print_command "roslaunch spark_navigation amcl_demo_rviz.launch camera_type_tel:=${CAMERATYPE} depthtolaser:=${depthtolaser}"
-		roslaunch spark_navigation amcl_demo_rviz.launch camera_type_tel:=${CAMERATYPE} depthtolaser:=${depthtolaser}
+		print_command "roslaunch spark_navigation amcl_demo_rviz.launch camera_type_tel:=${CAMERATYPE}"
+		roslaunch spark_navigation amcl_demo_rviz.launch camera_type_tel:=${CAMERATYPE} 
 	else
-		print_command "roslaunch spark_rtabmap spark_rtabmap_nav.launch camera_type_tel:=${CAMERATYPE} depthtolaser:=${depthtolaser}"	
-		roslaunch spark_rtabmap spark_rtabmap_nav.launch camera_type_tel:=${CAMERATYPE} depthtolaser:=${depthtolaser}
+		print_command "roslaunch spark_rtabmap spark_rtabmap_nav.launch camera_type_tel:=${CAMERATYPE}"	
+		roslaunch spark_rtabmap spark_rtabmap_nav.launch camera_type_tel:=${CAMERATYPE} 
 	fi	
 }
 
@@ -833,14 +833,14 @@ spark_build_map_3d(){
 		echo -e "${Tip}" 
 		echo && stty erase ^? && read -p "请选择是否继续y/n：" choose
 		if [[ "${choose}" == "y" ]]; then
-			print_command "roslaunch spark_rtabmap spark_rtabmap_teleop.launch camera_type_tel:=${CAMERATYPE} depthtolaser:=${depthtolaser}"
-                	roslaunch spark_rtabmap spark_rtabmap_teleop.launch camera_type_tel:=${CAMERATYPE} depthtolaser:=${depthtolaser}
+			print_command "roslaunch spark_rtabmap spark_rtabmap_teleop.launch camera_type_tel:=${CAMERATYPE}"
+                	roslaunch spark_rtabmap spark_rtabmap_teleop.launch camera_type_tel:=${CAMERATYPE}
 		else
 			return
 		fi
         else
-        	print_command "roslaunch spark_slam depth_slam_teleop.launch slam_methods_tel:=${SLAMTYPE} camera_type_tel:=${CAMERATYPE} depthtolaser:=${depthtolaser}"
-		roslaunch spark_slam depth_slam_teleop.launch slam_methods_tel:=${SLAMTYPE} camera_type_tel:=${CAMERATYPE} depthtolaser:=${depthtolaser}
+        	print_command "roslaunch spark_slam depth_slam_teleop.launch slam_methods_tel:=${SLAMTYPE} camera_type_tel:=${CAMERATYPE}"
+		roslaunch spark_slam depth_slam_teleop.launch slam_methods_tel:=${SLAMTYPE} camera_type_tel:=${CAMERATYPE}
 	fi
 	
 }

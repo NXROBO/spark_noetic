@@ -2,16 +2,17 @@
 <launch>
   	<!-- camera -->
   	<arg name="camera_types" default="" doc="camera type [astrapro, astra]"/>
-	<arg name="point2laser"	default="/camera/depth/points"/>
+	<arg name="depthtolaser"	default="/camera/depth/points"/>
 
 	<!-- spark底盘驱动，机器人描述,底盘,相机 -->
 	<include file="$(find spark_bringup)/launch/driver_bringup.launch">
 		<arg name="camera_types"	value="$(arg camera_types)"/>
 		<arg name="dp_rgist"		value="true"/>
 	</include>
-	<include file="$(find spark_slam)/launch/pointcloud2scan.launch">
-		<arg name="point2laser"	value="$(arg point2laser)"/>
-	</include>	
+	<!-- Run the depthimage_to_laserscan node -->
+	<include file="$(find camera_driver_transfer)/launch/$(arg camera_types)_p2s.launch">
+	</include>
+
  
   	<!-- Move base -->
   	<include file="$(find spark_navigation)/launch/includes/move_base.launch.xml"/>

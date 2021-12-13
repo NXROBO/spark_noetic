@@ -2,7 +2,6 @@
 <!--SPARK技术讨论与反馈群：8346256-->
 <launch>
   	<!-- Arguments -->
-	<arg name="depthtolaser"	default="/camera/depth/image_rect_raw"/>
   	<arg name="slam_methods" default="gmapping" doc="slam type [gmapping, cartographer, hector, karto, frontier_exploration]"/>
   	<arg name="camera_types" default="astrapro" doc="camera type [astrapro, astra, d435]"/>
   	<arg name="configuration_basename" default="spark_lds_2d.lua"/>
@@ -12,25 +11,11 @@
 	<include file="$(find spark_bringup)/launch/driver_bringup.launch">
 		<arg name="camera_types" 	value="$(arg camera_types)"/>
 	</include>
+	
+	<!-- Run the depthimage_to_laserscan node -->
+	<include file="$(find camera_driver_transfer)/launch/$(arg camera_types)_p2s.launch">
+	</include>
 
-  	<!-- Run the depthimage_to_laserscan node -->
-	<include file="$(find spark_slam)/launch/pointcloud2scan.launch"/>
-  	<!--
-  	<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan" output="screen">
-    
-
-    		<remap from="image" to="$(arg depthtolaser)" />
-
-    		
-    		<remap from="camera_info" to="/camera/depth/camera_info" />
-
-    		<remap from="scan" to="/scan" />
-    		<param name="output_frame_id" value="camera_depth_frame" />
-
-    		
-    		<param name="scan_height" value="50" />
-  	</node>
-	-->
   	<!-- SLAM: Gmapping, Cartographer, Hector, Karto, Frontier_exploration, RTAB-Map -->
   	<include file="$(find spark_slam)/launch/spark_$(arg slam_methods).launch">
     	<!--arg name="model" value="$(arg model)"/-->
