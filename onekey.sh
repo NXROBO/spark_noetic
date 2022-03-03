@@ -28,13 +28,18 @@ calibra_default="${filepath}/../.ros/camera_info"
 
 calibration="calibration"
 color_block="color_block"
-
+BASEPATH=$(cd `dirname $0`; pwd)
 TYPE_LIDAR=$(cat /opt/lidar.txt)
 echo ${TYPE_LIDAR}
-if [[ "${TYPE_LIDAR}" == "ydlidar_g2" ]]; then
+if [[ "${TYPE_LIDAR}" == "ydlidar_g6" ]]; then
+	LIDARTYPE="ydlidar_g6"
+	rm -f ${BASEPATH}/src/spark_driver/lidar/ydlidar_g6/CATKIN_IGNORE
+elif [[ "${TYPE_LIDAR}" == "ydlidar_g2" ]]; then
 	LIDARTYPE="ydlidar_g2"
+	touch ${BASEPATH}/src/spark_driver/lidar/ydlidar_g6/CATKIN_IGNORE
 elif [[ "${TYPE_LIDAR}" == "3iroboticslidar2" ]]; then
 	LIDARTYPE="3iroboticslidar2"
+	touch ${BASEPATH}/src/spark_driver/lidar/ydlidar_g6/CATKIN_IGNORE
 else
 	echo "暂不支持的雷达：${TYPE_LIDAR}，使用默认的杉川雷达运行"
 	LIDARTYPE="3iroboticslidar2"
@@ -296,10 +301,14 @@ master_uri_setup(){
 	wlp1s_ip=`/sbin/ifconfig wlp1s0|grep 'inet '|awk '{print $2}'`
 	wlp2s_ip=`/sbin/ifconfig wlp2s0|grep 'inet '|awk '{print $2}'`
 	wlan_ip=`/sbin/ifconfig wlan0|grep 'inet '|awk '{print $2}'`
-        enp3s_ip=`/sbin/ifconfig enp3s0|grep 'inet '|awk '{print $2}'`
+	enp3s_ip=`/sbin/ifconfig enp3s0|grep 'inet '|awk '{print $2}'`
+	wlo1_ip=`/sbin/ifconfig wlo1|grep 'inet '|awk '{print $2}'`
 	if [ $eth_ip ]; then
 		echo -e "${Info}使用有线网络eth0" 
 		local_ip=$eth_ip
+	elif [ $wlo1_ip ]; then
+		echo -e "${Info}使用无线网络wlo1" 
+	  	local_ip=$wlo1
 	elif [ $wlp1s_ip ]; then
 		echo -e "${Info}使用无线网络wlp1s0" 
 	  	local_ip=$wlp1s_ip
@@ -900,11 +909,14 @@ qrcode_transfer_files(){
 	wlp1s_ip=`/sbin/ifconfig wlp1s0|grep 'inet '|awk '{print $2}'`
 	wlp2s_ip=`/sbin/ifconfig wlp2s0|grep 'inet '|awk '{print $2}'`
 	wlan_ip=`/sbin/ifconfig wlan0|grep 'inet '|awk '{print $2}'`
-        enp3s_ip=`/sbin/ifconfig enp3s0|grep 'inet '|awk '{print $2}'`
-
+	enp3s_ip=`/sbin/ifconfig enp3s0|grep 'inet '|awk '{print $2}'`
+	wlo1_ip=`/sbin/ifconfig wlo1|grep 'inet '|awk '{print $2}'`
 	if [ $wlp1s_ip ]; then
 		echo -e "${Info}使用无线网络wlp1s0" 
 	  	net_interface="wlp1s0"
+	elif [ $wlo1_ip ]; then
+		echo -e "${Info}使用无线网络wlo1" 
+	  	net_interface="wlo1"	  	
 	elif [ $wlp2s_ip ]; then
 		echo -e "${Info}使用无线网络wlp2s0" 
 	  	net_interface="wlp2s0"
