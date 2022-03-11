@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 import roslib
 import sys
@@ -221,10 +221,11 @@ def msg_callback(data):
 
 def main():
 	rospy.init_node('image_converter', anonymous=True)
-
+	print("===============11111======")
 	sub1 = rospy.Subscriber("/camera/rgb/image_raw", Image, image_callback)
 	sub2 = rospy.Subscriber("cali_pix_topic", status, command_callback)
 	sub3 = rospy.Subscriber("start_topic", String, msg_callback)
+	print("=====================")
 	try:
 		rospy.spin()
 	except KeyboardInterrupt:

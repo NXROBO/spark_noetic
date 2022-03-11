@@ -122,7 +122,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  /usr/include/python2.7
+  /usr/include/python3
 )
 
 ## Declare a C++ library

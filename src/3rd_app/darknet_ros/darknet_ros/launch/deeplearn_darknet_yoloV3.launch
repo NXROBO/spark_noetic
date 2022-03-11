@@ -16,7 +16,7 @@
 
 	<!-- rviz -->
   	<arg name ="rviz" default="true" />
-  	<arg name ="rviz_file" default="$(find tensorflow_object_detector)/config/display.rviz"/>
+  	<arg name ="rviz_file" default="$(find tensorflow_object_detector)/config/display_$(arg camera_type_tel).rviz"/>
 	<node pkg ="rviz" type="rviz" name="rviz" output="screen" args= "-d $(arg rviz_file)" if="$(arg rviz)"/>
 
 

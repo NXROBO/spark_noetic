@@ -539,6 +539,7 @@ spark_DeepLearn(){
 		roslaunch tensorflow_object_detector object_detect.launch camera_type_tel:=${CAMERATYPE}		
 		;;
 		2)
+		print_command "roslaunch darknet_ros deeplearn_darknet_yoloV3.launch camera_type_tel:=${CAMERATYPE}"
 		roslaunch darknet_ros deeplearn_darknet_yoloV3.launch camera_type_tel:=${CAMERATYPE}
 		;;
 		*)
