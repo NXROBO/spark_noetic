@@ -909,6 +909,7 @@ qrcode_transfer_files(){
 	wlp2s_ip=`/sbin/ifconfig wlp2s0|grep 'inet '|awk '{print $2}'`
 	wlan_ip=`/sbin/ifconfig wlan0|grep 'inet '|awk '{print $2}'`
 	enp3s_ip=`/sbin/ifconfig enp3s0|grep 'inet '|awk '{print $2}'`
+	wlp0s_ip=`/sbin/ifconfig wlp0s20f3|grep 'inet '|awk '{print $2}'`
 	wlo1_ip=`/sbin/ifconfig wlo1|grep 'inet '|awk '{print $2}'`
 	if [ $wlp1s_ip ]; then
 		echo -e "${Info}使用无线网络wlp1s0" 
@@ -925,6 +926,9 @@ qrcode_transfer_files(){
 	elif [ $enp3s_ip ]; then
 		echo -e "${Info}使用无线网络enp3s0" 
 		net_interface="enp3s0"
+	elif [ $wlp0s_ip ]; then
+		echo -e "${Info}使用无线网络wlp0s20f3" 
+		net_interface="wlp0s20f3"		
 	elif [ $eth_ip ]; then
 		echo -e "${Info}使用有线网络eth0" 
 		net_interface="eth0"
