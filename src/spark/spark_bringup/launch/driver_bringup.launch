@@ -26,7 +26,7 @@
 	<!--打开摄像头 -->
 	<group if="$(arg start_camera)">
 		<!-- 启动摄像头 -->
-  		<include file="$(find camera_driver_transfer)/launch/$(arg camera_types).launch">
+  		<include file="$(find camera_driver_transfer)/launch/$(arg camera_type_tel).launch">
 			<arg name="dp_rgist"	value="$(arg dp_rgist)"/>	
 		</include>
 	</group>
