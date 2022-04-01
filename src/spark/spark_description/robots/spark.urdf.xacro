@@ -9,8 +9,13 @@
 <robot name="spark" xmlns:xacro="http://ros.org/wiki/xacro">
 	<xacro:arg name="camera_type_tel" default="astrapro"/>
 	<xacro:arg name="lidar_type_tel"	default="3iroboticslidar2"/>
+	<xacro:arg name="enable_arm_tel"	default="false"/>
+	<xacro:arg name="arm_type_tel"	default="uarm"/>	
+	
   	<xacro:include filename="$(find spark_description)/urdf/spark_340.urdf.xacro">
 		<xacro:arg name="camera_type_tel"	value="$(arg camera_type_tel)"/>	
-		<xacro:arg name="lidar_type_tel"	value="$(arg lidar_type_tel)"/>	
+		<xacro:arg name="lidar_type_tel"	value="$(arg lidar_type_tel)"/>
+		<xacro:arg name="enable_arm_tel"	value="$(arg enable_arm_tel)"/>
+		<xacro:arg name="arm_type_tel"	value="$(arg arm_type_tel)"/>
 	</xacro:include> 	
 </robot>

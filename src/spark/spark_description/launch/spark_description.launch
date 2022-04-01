@@ -10,7 +10,7 @@
   	<arg name="use_gui" default="false"/>
   	<arg name="publish_default_positions" default="true"/>
 
-	<param name="robot_description" command="$(find xacro)/xacro --inorder '$(arg model)' camera_type_tel:=$(arg camera_type_tel) lidar_type_tel:=$(arg lidar_type_tel)"/>
+	<param name="robot_description" command="$(find xacro)/xacro --inorder '$(arg model)' camera_type_tel:=$(arg camera_type_tel) lidar_type_tel:=$(arg lidar_type_tel) arm_type_tel:=$(arg arm_type_tel) enable_arm_tel:=$(arg enable_arm_tel)"/>
 
 
     <group if="$(eval arg('arm_type_tel')=='sagittarius_arm')">
