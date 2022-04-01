@@ -5,7 +5,7 @@
 
   	<!--导航-->
   	<include file="$(find spark_navigation)/launch/amcl_demo_lidar.launch">
-		<arg name="camera_types"	value="$(arg camera_type_tel)"/>
+		<arg name="camera_type_tel"	value="$(arg camera_type_tel)"/>
 		<arg name="start_camera"	value="true">	
 	</include>
     

@@ -45,15 +45,24 @@ check_dev(){
 		echo -e "${Error} 底盘没有正确连接，请确认正确连接！！"
 	fi
 	#检查机械臂
-	if [ ! -n "$(lsusb -d 2341:0042)" ]; then
-		echo -e "${Error} 机械臂没有正确连接，请确认正确连接！！"
+	if [ -n "$(lsusb -d 2341:0042)" ]; then
+		echo -e "${Info} 正在使用UARM机械臂"	
+		ARMTYPE="uarm"		
+	elif [ -n "$(lsusb -d 2e88:4603)" ]; then
+		echo -e "${Info} 正在使用射手座机械臂"
+		ARMTYPE="sagittarius_arm"	
+	else
+		echo -e "${Error} 机械臂没有正确连接或未上电，请确认正确连接！！"	
+		ARMTYPE="uarm"				
 	fi
+
 	
 	#检查摄像头
 	check_camera
 	#检查雷达
 	check_lidar
 }
+
 #检查雷达设备
 check_lidar(){
 	BASEPATH=$(cd `dirname $0`; pwd)
@@ -301,6 +310,7 @@ master_uri_setup(){
 	wlan_ip=`/sbin/ifconfig wlan0|grep 'inet '|awk '{print $2}'`
 	enp3s_ip=`/sbin/ifconfig enp3s0|grep 'inet '|awk '{print $2}'`
 	wlo1_ip=`/sbin/ifconfig wlo1|grep 'inet '|awk '{print $2}'`
+	wlp0s_ip=`/sbin/ifconfig wlp0s20f3|grep 'inet '|awk '{print $2}'`
 	if [ $eth_ip ]; then
 		echo -e "${Info}使用有线网络eth0" 
 		local_ip=$eth_ip
@@ -316,9 +326,12 @@ master_uri_setup(){
 	elif [ $wlan_ip ]; then
 		echo -e "${Info}使用无线网络wlan0" 
 	  	local_ip=$wlan_ip
-        elif [ $enp3s_ip ]; then
-                echo -e "${Info}使用无线网络enp3s0" 
-                local_ip=$enp3s_ip	
+	elif [ $enp3s_ip ]; then
+		echo -e "${Info}使用无线网络enp3s0" 
+		local_ip=$enp3s_ip	
+	elif [ $wlp0s_ip ]; then
+		echo -e "${Info}使用无线网络wlp0s20f3" 
+		local_ip=$wlp0s_ip			
 	fi
 	export ROS_HOSTNAME=$local_ip
 	export ROS_MASTER_URI="http://${local_ip}:11311"
@@ -347,8 +360,8 @@ let_robot_go(){
 	echo -e "${Info}                           " 
 	echo -e "${Info}    退出请输入：Ctrl + c    " 
 	echo && stty erase ^? && read -p "按回车键（Enter）开始：" 
-	print_command "roslaunch spark_teleop teleop.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
-	roslaunch spark_teleop teleop.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
+	print_command "roslaunch spark_teleop teleop.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE} enable_arm_tel:=false"
+	roslaunch spark_teleop teleop.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE} enable_arm_tel:="false"
 }
 
 
