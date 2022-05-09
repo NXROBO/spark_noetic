@@ -17,8 +17,6 @@ grasp_pub = rospy.Publisher('/grasp', String, queue_size=1)
 global can_grasp
 global can_release
 
-
-
 def grasp_status_cp(msg):
     global can_release,can_grasp
     # 物体抓取成功,让机器人回起始点
@@ -29,29 +27,34 @@ def grasp_status_cp(msg):
 grasp_status=rospy.Subscriber('/grasp_status', String, grasp_status_cp, queue_size=1)
 
 def keyboardLoop():
-    #初始化
     rospy.init_node('teleop')
+    #初始化监听键盘按钮时间间隔
     rate = rospy.Rate(rospy.get_param('~hz', 10))
  
     #速度变量
+    # 慢速
     walk_vel_ = rospy.get_param('walk_vel', 0.3)
+    # 快速
     run_vel_ = rospy.get_param('run_vel', 1.0)
     yaw_rate_ = rospy.get_param('yaw_rate', 1.0)
     yaw_rate_run_ = rospy.get_param('yaw_rate_run', 1.5)
- 
+    # walk_vel_前后速度
     max_tv = walk_vel_
+    # yaw_rate_旋转速度
     max_rv = yaw_rate_
+    # 参数初始化
     speed=0
     global can_release,can_grasp
     can_grasp=True
     can_release=False
     
-    print "使用[WASD]控制机器人"
-    print "按[G]抓取物体，按[H]放下物体"
-    print "按[Q]退出"
+    print ("使用[WASD]控制机器人")
+    print ("按[G]抓取物体，按[H]放下物体")
+    print ("按[Q]退出" )
  
     #读取按键循环
     while not rospy.is_shutdown():
+        # linux下读取键盘按键
         fd = sys.stdin.fileno()
         turn =0
         old_settings = termios.tcgetattr(fd)
@@ -62,7 +65,7 @@ def keyboardLoop():
             ch = sys.stdin.read( 1 )
         finally :
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
- 
+        # ch代表获取的键盘按键
         if ch == 'g':
             if can_grasp:
                 msg=String()

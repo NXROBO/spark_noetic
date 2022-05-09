@@ -65,16 +65,34 @@ Visualization Manager:
           Value: false
         base_link:
           Value: true
+        camera_aligned_depth_to_color_frame:
+          Value: true
+        camera_aligned_depth_to_infra1_frame:
+          Value: true
+        camera_bottom_screw_frame:
+          Value: true
+        camera_color_frame:
+          Value: true
+        camera_color_optical_frame:
+          Value: true
         camera_depth_frame:
           Value: false
         camera_depth_optical_frame:
           Value: false
+        camera_infra1_frame:
+          Value: true
+        camera_infra1_optical_frame:
+          Value: true
+        camera_left_ir_frame:
+          Value: true
+        camera_left_ir_optical_frame:
+          Value: true
         camera_link:
           Value: true
-        camera_rgb_frame:
-          Value: false
-        camera_rgb_optical_frame:
-          Value: false
+        camera_right_ir_frame:
+          Value: true
+        camera_right_ir_optical_frame:
+          Value: true
         cliff_back_left_link:
           Value: false
         cliff_back_right_link:
@@ -133,12 +151,26 @@ Visualization Manager:
                   {}
                 base_gyro_link:
                   {}
-                camera_link:
-                  camera_depth_frame:
-                    camera_depth_optical_frame:
+                camera_bottom_screw_frame:
+                  camera_link:
+                    camera_aligned_depth_to_color_frame:
+                      camera_color_optical_frame:
+                        {}
+                    camera_aligned_depth_to_infra1_frame:
+                      camera_infra1_optical_frame:
+                        {}
+                    camera_color_frame:
                       {}
-                  camera_rgb_frame:
-                    camera_rgb_optical_frame:
+                    camera_depth_frame:
+                      camera_depth_optical_frame:
+                        {}
+                      camera_left_ir_frame:
+                        camera_left_ir_optical_frame:
+                          {}
+                      camera_right_ir_frame:
+                        camera_right_ir_optical_frame:
+                          {}
+                    camera_infra1_frame:
                       {}
                 cliff_back_left_link:
                   {}
@@ -212,7 +244,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /camera/rgb/image_raw
+      Image Topic: /camera/color/image_raw
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -258,6 +290,18 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        camera_bottom_screw_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_color_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_color_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         camera_depth_frame:
           Alpha: 1
           Show Axes: false
@@ -266,16 +310,24 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        camera_left_ir_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_left_ir_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         camera_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        camera_rgb_frame:
+        camera_right_ir_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_rgb_optical_frame:
+        camera_right_ir_optical_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false

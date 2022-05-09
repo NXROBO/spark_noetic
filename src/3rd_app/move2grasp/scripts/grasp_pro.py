@@ -20,7 +20,7 @@ from geometry_msgs.msg import Pose, Point, Quaternion
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from spark_carry_object.msg import *
-
+import threading
 class GraspObject():
     '''
     监听主控，用于物品抓取功能
@@ -199,7 +199,7 @@ class GraspObject():
             cv2.imshow("win2", mask)
             cv2.waitKey(1)
             if detect_color_blue :
-                _, contours, hier = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                contours, hier = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
                 if len(contours) > 0:
                     size = []
                     size_max = 0

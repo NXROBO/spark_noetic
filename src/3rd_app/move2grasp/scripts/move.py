@@ -17,14 +17,14 @@ class Move2Grasp():
  
         rospy.on_shutdown(self.shutdown)
         #订阅RVIZ上的点击事件
-	rospy.Subscriber('clicked_point', PointStamped, self.cp_callback)
+        rospy.Subscriber('clicked_point', PointStamped, self.cp_callback)
         #订阅机械臂抓取状态
         rospy.Subscriber('/grasp_status', String, self.grasp_status_cp, queue_size=1)
         # Publisher to manually control the robot (e.g. to stop it)  
         # 发布TWist消息控制机器人  
         self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
         # 发布机械臂抓取指令 
-        self.grasp_pub = rospy.Publisher('/grasp', String, queue_size=1)  
+        self.grasp_pub = rospy.Publisher('/grasp', String, queue_size=1)
  
         # Subscribe to the move_base action server  
         # 订阅move_base服务器的消息  
@@ -66,6 +66,7 @@ class Move2Grasp():
             status=self.move(goal)
             # 如果到达指定地点,就发送抓取指令
             if status==True:
+                print('goal reached and start grasp')
                 msg=String()
                 msg.data='1'
                 self.grasp_pub.publish(msg)
@@ -73,13 +74,13 @@ class Move2Grasp():
     def grasp_status_cp(self, msg):
             # 物体抓取成功,让机器人回起始点
             if msg.data=='1': 
-                goal = MoveBaseGoal() 
+                goal = MoveBaseGoal()
                 goal.target_pose.header.frame_id = 'map' 
                 goal.target_pose.header.stamp = rospy.Time.now() 
-                pose = Pose(Point(0.0,0.0,0.0), Quaternion(0.0, 0.0, 0.0, 1.0))
+                pose = Pose(Point(0.3,0.0,0.0), Quaternion(0.0, 0.0, 1.0, 0.0))
                 goal.target_pose.pose=pose  
                 status=self.move(goal)
-                status=self.move(goal)
+                #status=self.move(goal)
                 # 到达起始点,放下物体
                 if status==True:
                     msg=String()

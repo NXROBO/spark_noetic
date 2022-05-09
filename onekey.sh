@@ -9,7 +9,7 @@ export PATH
 #    SPARK技术讨论与反馈QQ群：6646169  8346256
 #=================================================
 
-GAME_ENABLE="no"
+GAME_ENABLE="yes"
 sh_ver="2.0"
 filepath=$(cd "$(dirname "$0")"; pwd)
 Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Yellow_background_prefix="\033[43;37m" && Font_color_suffix="\033[0m" && Yellow_font_prefix="\e[1;33m" && Blue_font_prefix="\e[0;34m"
@@ -1090,6 +1090,9 @@ case "$num" in
 	;;
 	12)
 	calibrate_camera
+	;;
+	20)
+	spark_carry_game
 	;;
 	100)
 	tell_us

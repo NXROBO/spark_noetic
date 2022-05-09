@@ -21,6 +21,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from spark_carry_object.msg import *
 
+
 class GraspObject():
     '''
     监听主控，用于物品抓取功能
@@ -31,18 +32,14 @@ class GraspObject():
         初始化
         '''
 
-        global xc, yc, xc_prev, yc_prev, found_count, detect_color_blue
+        global xc, yc, xc_prev, yc_prev, found_count
         xc = 0
         yc = 0
         xc_prev = xc
         yc_prev = yc
         found_count = 0
-        detect_color_blue=False
         self.is_found_object = False
         # self.sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.image_cb, queue_size=1)
-        thread1 = threading.Thread(target=self.image_cb,)
-        thread1.setDaemon(True)
-        thread1.start()
         # 订阅机械臂抓取指令
         self.sub2 = rospy.Subscriber(
             '/grasp', String, self.grasp_cp, queue_size=1)
@@ -56,8 +53,6 @@ class GraspObject():
             'grasp_status', String, queue_size=1)
         # 发布TWist消息控制机器人底盘
         self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
-        r1 = rospy.Rate(1)
-        r1.sleep()
         pos = position()
         pos.x = 120
         pos.y = 0
@@ -65,12 +60,9 @@ class GraspObject():
         self.pub1.publish(pos)
 
     def grasp_cp(self, msg):
-        global detect_color_blue
-        rospy.loginfo("recvice grasp command:%s",msg.data)
         if msg.data == '1':
             # 订阅摄像头话题,对图像信息进行处理
-            #self.sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.image_cb, queue_size=1)
-            detect_color_blue=True
+            self.sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.image_cb, queue_size=1)
             self.is_found_object = False
             rate = rospy.Rate(10)
             times=0
@@ -80,9 +72,8 @@ class GraspObject():
                 times+=1
                 # 转一圈没有发现可抓取物体,退出抓取
                 if steps>=5:
-                    #self.sub.unregister()
+                    self.sub.unregister()
                     print("stop grasp\n")
-                    detect_color_blue=False
                     status=String()
                     status.data='-1'
                     self.grasp_status_pub.publish(status)
@@ -94,8 +85,9 @@ class GraspObject():
                     self.turn_body()
                     print("not found\n")
             print("unregisting sub\n")
-            # 抓取检测到的物体 
-            detect_color_blue=False   
+            self.sub.unregister()
+            print("unregisted sub\n")
+            # 抓取检测到的物体    
             self.grasp()
             status=String()
             status.data='1'
@@ -103,16 +95,14 @@ class GraspObject():
         if msg.data=='0':
             # 放下物体
             self.is_found_object = False
-            detect_color_blue=False
             self.release_object()
             status=String()
             status.data='0'
-            
-            self.grasp_status_pub.publish(status)
+            self.grasp_status_pub.publish(status) 
 
     # 执行抓取
     def grasp(self):
-        rospy.loginfo("start to grasp\n")
+        print("start to grasp\n")
         global xc, yc, found_count
         # stop function
 
@@ -140,7 +130,7 @@ class GraspObject():
         pos.x = a[0] * yc + a[1]
         pos.y = b[0] * xc + b[1]
         pos.z = 20
-         # pos.z = 20
+	    # pos.z = 20
         print("z = 20\n")
         self.pub1.publish(pos)
         r2.sleep()
@@ -155,111 +145,96 @@ class GraspObject():
         r2.sleep()
 
         # 提起物体
-        pos.x = 200  #160
+        pos.x = 250  #160
         pos.y = 0
-        pos.z = 155  #55
+        pos.z = 150  #55
         self.pub1.publish(pos)
         r1.sleep()
-
-    def hsv_value(self):
-        try:
-            filename = os.environ['HOME'] + "/color_block_HSV.txt"
-            with open(filename, "r") as f:
-                for line in f:
-                    split = line.split(':')[1].split(' ')
-                    lower = split[0].split(',')
-                    upper = split[1].split(',')
-                    for i in range(3):
-                        lower[i] = int(lower[i])
-                        upper[i] = int(upper[i])
-
-            lower = np.array(lower)
-            upper = np.array(upper)
-        except:
-            raise IOError('could not find hsv_value file : {},please execute #13 command automatically '
-                          'generate this file'.format(filename))
-
-        return lower, upper
-
     # 使用CV检测物体       
-    def image_cb(self):
-        global xc, yc, xc_prev, yc_prev, found_count, detect_color_blue	
-        capture = cv2.VideoCapture(0)
-        LowerBlue, UpperBlue = self.hsv_value()
+    def image_cb(self, data):
+        global xc, yc, xc_prev, yc_prev, found_count
+        # change to opencv
+        try:
+            cv_image1 = CvBridge().imgmsg_to_cv2(data, "bgr8")
+        except CvBridgeError as e:
+            print('error')
 
-        while True:
-            # time.sleep(0.08)
-            ret,frame = capture.read()
-            cv_image2 = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            mask = cv2.inRange(cv_image2, LowerBlue, UpperBlue)		
-            mask = cv2.erode(mask, None, iterations=2)
-            mask = cv2.dilate(mask, None, iterations=2)
-            mask = cv2.GaussianBlur(mask, (9,9), 0)
-            # detect contour
-            cv2.imshow("win2", mask)
-            cv2.waitKey(1)
-            if detect_color_blue :
-                _, contours, hier = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-                if len(contours) > 0:
-                    size = []
-                    size_max = 0
-                    distance_list = []
-                    max_distance = 450
-                    for i, c in enumerate(contours):
-                        rect = cv2.minAreaRect(c)
-                        box = cv2.boxPoints(rect)
-                        box = np.int0(box)
-                        x_mid, y_mid = rect[0]
+        # change rgb to hsv
+        cv_image2 = cv2.cvtColor(cv_image1, cv2.COLOR_BGR2HSV)
 
-                        w = math.sqrt((box[0][0] - box[1][0])**2 + (box[0][1] - box[1][1])**2)
-                        h = math.sqrt((box[0][0] - box[3][0])**2 + (box[0][1] - box[3][1])**2)
+        # 蓝色物体颜色检测范围
+        LowerBlue = np.array([95, 90, 80])
+        UpperBlue = np.array([130, 255, 255])
+        mask = cv2.inRange(cv_image2, LowerBlue, UpperBlue)
+        cv_image3 = cv2.bitwise_and(cv_image2, cv_image2, mask=mask)
 
-                        size.append(w * h)
-                        # 所有点到spark的距离
-                        distance_list.append(math.sqrt((320 - x_mid) ** 2 + (300 - y_mid) ** 2))
+        # gray process
+        cv_image4 = cv_image3[:, :, 0]
 
-                        if size[i] > size_max and distance_list[i] < max_distance:
-                            size_max = size[i]
-                            min_distance = distance_list[i]
-                            index = i
-                            xc = x_mid
-                            yc = y_mid
-                            cv2.circle(frame, (np.int32(xc), np.int32(yc)), 2, (255, 0, 0), 2, 8, 0)
-                    if found_count >= 15 and min_distance < 350:
-                        self.is_found_object = True
-                        cmd_vel = Twist()
-                        self.cmd_vel_pub.publish(cmd_vel)
-                    else:
-                        # if box is not moving
-                        if abs(xc - xc_prev) <= 50 and abs(yc - yc_prev) <= 50 and yc > 150 and yc < 370 and xc > 100 and xc < 540:
-                            found_count = found_count + 1
-                        else:
-                            found_count = 0
+        # smooth and clean noise
+        blurred = cv2.blur(cv_image4, (9, 9))
+        (_, thresh) = cv2.threshold(blurred, 90, 255, cv2.THRESH_BINARY)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (25, 25))
+        cv_image5 = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+        cv_image5 = cv2.erode(cv_image5, None, iterations=4)
+        cv_image5 = cv2.dilate(cv_image5, None, iterations=4)
 
+        # detect contour
+        # cv2.imshow("win1", cv_image1)
+        # cv2.imshow("win2", cv_image5)
+        # cv2.waitKey(1)
+        contours, hier = cv2.findContours(cv_image5, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        # if find contours, pick the biggest box
+        if len(contours) > 0:
+            size = []
+            size_max = 0
+            for i, c in enumerate(contours):
+                rect = cv2.minAreaRect(c)
+                box = cv2.boxPoints(rect)
+                box = np.int0(box)
+                x_mid = (box[0][0] + box[2][0] + box[1][0] + box[3][0]) / 4
+                y_mid = (box[0][1] + box[2][1] + box[1][1] + box[3][1]) / 4
+                w = math.sqrt((box[0][0] - box[1][0]) ** 2 + (box[0][1] - box[1][1]) ** 2)
+                h = math.sqrt((box[0][0] - box[3][0]) ** 2 + (box[0][1] - box[3][1]) ** 2) 
+                size.append(w * h)
+                if size[i] > size_max:
+                    size_max = size[i]
+                    index = i
+                    xc = x_mid
+                    yc = y_mid
+            # if box is not moving for 20 times
+            # print found_count
+            if found_count >= 30:
+                self.is_found_object = True
+                cmd_vel = Twist()
+                self.cmd_vel_pub.publish(cmd_vel)
+            else:
+                # if box is not moving
+                if abs(xc - xc_prev) <= 2 and abs(yc - yc_prev) <= 2:
+                    found_count = found_count + 1
                 else:
                     found_count = 0
-            xc_prev = xc
-            yc_prev = yc
-            cv2.imshow("win1", frame)
-            cv2.waitKey(1)
-            #key = cv2.waitKey(10)
- 
+        else:
+            found_count = 0
+        xc_prev = xc
+        yc_prev = yc
     # 释放物体
     def release_object(self):
-        r1 = rospy.Rate(1)
-        r2 = rospy.Rate(1)
+        r1 = rospy.Rate(0.15)  # 5s
+        r2 = rospy.Rate(1)     # 1s
         pos = position()
         # go forward
         pos.x = 200
         pos.y = 0
-        pos.z = -40
+        pos.z = -40  #-80
         self.pub1.publish(pos)
         r1.sleep()
 
         # stop pump
         self.pub2.publish(0)
         r2.sleep()
-        r1.sleep()
+        #r1.sleep()
         pos.x = 120
         pos.y = 0
         pos.z = 35

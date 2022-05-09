@@ -5,34 +5,26 @@
   	<arg name="slam_methods" default="gmapping" doc="slam type [gmapping, cartographer, hector, karto, frontier_exploration]"/>
   	<arg name="configuration_basename" default="spark_lds_2d.lua"/>
   	<arg name="open_rviz" default="true"/>
+	<arg name="lidar_type_tel" default="3iroboticslidar2" doc="lidar type [3iroboticslidar2, ydlidar_g2]"/>
+	<!-- 摄像机类型 -->
+	<arg name="camera_type_tel" default="astrapro" doc="camera type [astrapro, astra, d435...]"/>
 
+	<!--spark底盘驱动，机器人描述,底盘,相机-->
+	<include file="$(find spark_bringup)/launch/driver_bringup.launch">
+		<arg name="camera_type_tel"	value="$(arg camera_type_tel)"/>
+		<arg name="lidar_type_tel"	value="$(arg lidar_type_tel)"/>
+	</include>
 
-	<include file="$(find spark_description)/launch/spark_description_norviz.launch"/>
- 	<!--include file="$(find spark_description)/launch/spark_description.launch"/-->
-
-
-   	<include file="$(find spark_base)/launch/spark_base.launch">
-		<arg name="serialport"                  value="/dev/sparkBase"/>
- 	</include> 
-
-  <!--spark相机-->
-  <!--include file="$(find spark_bringup)/launch/driver_bringup.launch"/-->
-  <include file="$(find astra_launch)/launch/astra.launch">
-	<arg name="rgb_processing"                  value="true"/> 
-	<arg name="depth_processing"                value="true"/>
-	<arg name="depth_registered_processing"     value="false"/>
-	<arg name="depth_registration"              value="false"/>
-	<arg name="disparity_processing"            value="false"/>
-	<arg name="disparity_registered_processing" value="false"/>
-  </include>
     
   <!--UARM机械臂-->
   <include file="$(find swiftpro)/launch/pro_control_nomoveit.launch"/>
 
  	<!-- 3D sensor -->
   	<arg name="3d_sensor" default="3i_lidar"/>  
-    		<include file="$(find iiiroboticslidar2)/launch/3iroboticslidar2.launch">
-  	</include>
+ 	<!-- 启动雷达 -->
+	<include file="$(find lidar_driver_transfer)/launch/$(arg lidar_type_tel).launch">
+	</include>
+
 
   	<!-- SLAM: Gmapping, Cartographer, Hector, Karto, Frontier_exploration-->
   	<include file="$(find spark_slam)/launch/spark_$(arg slam_methods).launch">
@@ -48,11 +40,18 @@
 
   	<!-- rviz -->
   	<group if="$(arg open_rviz)"> 
-    		<node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find move2grasp)/rviz/spark_$(arg slam_methods).rviz"/>
+    		<node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find move2grasp)/rviz/spark_$(arg slam_methods)_$(arg camera_type_tel).rviz"/>
   	</group>
 
 
         <node pkg="move2grasp" type="move.py" name="move" />
-        <node pkg="move2grasp" type="grasp.py" name="grasp" />
+	<group if="$(eval arg('camera_type_tel')=='d435')">
+		<node pkg="move2grasp" type="grasp_d435.py" name="grasp" output="screen">
+			<remap from="/camera/rgb/image_raw" to="/camera/color/image_raw" if="$(eval arg('camera_type_tel')=='d435')"/>
+		</node>
+	</group>
+	<group if="$(eval arg('camera_type_tel')=='astrapro')">
+		<node pkg="move2grasp" type="grasp_pro.py" name="grasp" />
+	</group>
 
 </launch>
