@@ -1042,6 +1042,8 @@ echo -e "
   ${Green_font_prefix} 10.${Font_color_suffix} 深度学习进行物品检测
   ${Green_font_prefix} 11.${Font_color_suffix} 语音控制SPARK移动
   ${Green_font_prefix} 12.${Font_color_suffix} 给摄像头做标定
+  
+  ${Green_font_prefix} 20.${Font_color_suffix} 比赛程序
 
 ————————————
 
