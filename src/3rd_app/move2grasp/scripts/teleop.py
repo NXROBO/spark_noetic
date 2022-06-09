@@ -33,7 +33,7 @@ def keyboardLoop():
  
     #速度变量
     # 慢速
-    walk_vel_ = rospy.get_param('walk_vel', 0.3)
+    walk_vel_ = rospy.get_param('walk_vel', 0.2)
     # 快速
     run_vel_ = rospy.get_param('run_vel', 1.0)
     yaw_rate_ = rospy.get_param('yaw_rate', 1.0)
@@ -72,12 +72,16 @@ def keyboardLoop():
                 msg.data='1'
                 grasp_pub.publish(msg)
                 can_grasp=False
+                speed = 0
+                turn = 0
         elif ch == 'h':
             if can_release:
                 msg=String()
                 msg.data='0'
                 grasp_pub.publish(msg)
                 can_release=False
+                speed = 0
+                turn = 0
         elif ch == 'w':
             max_tv = walk_vel_
             speed = 1
@@ -124,7 +128,7 @@ def keyboardLoop():
         pub.publish(cmd)
         rate.sleep()
 		#停止机器人
-        stop_robot()
+        #stop_robot()
  
 def stop_robot():
     cmd.linear.x = 0.0

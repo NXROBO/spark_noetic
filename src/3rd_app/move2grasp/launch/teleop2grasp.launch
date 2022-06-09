@@ -15,6 +15,7 @@
 
 		<arg name="camera_type_tel"	value="$(arg camera_type_tel)"/>
 		<arg name="lidar_type_tel"	value="$(arg lidar_type_tel)"/>
+		<arg name="start_camera" value="true"/>	
 	</include>
 
 
@@ -53,7 +54,7 @@
 		</node>
 	</group>
 	<group if="$(eval arg('camera_type_tel')=='astrapro')">
-		<node pkg="move2grasp" type="grasp_pro.py" name="grasp" />
+		<node pkg="move2grasp" type="grasp_pro_new.py" name="grasp" output="screen"/>
 	</group>
 
 </launch>

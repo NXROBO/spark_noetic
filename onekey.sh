@@ -9,7 +9,7 @@ export PATH
 #    SPARK技术讨论与反馈QQ群：6646169  8346256
 #=================================================
 
-GAME_ENABLE="yes"
+GAME_ENABLE="no"
 sh_ver="2.0"
 filepath=$(cd "$(dirname "$0")"; pwd)
 Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Yellow_background_prefix="\033[43;37m" && Font_color_suffix="\033[0m" && Yellow_font_prefix="\e[1;33m" && Blue_font_prefix="\e[0;34m"
@@ -98,6 +98,21 @@ check_lidar(){
 		echo -e "${Error} 没有找到雷达，请确认雷达已正确连接！！"
 	fi	
 }
+
+check_camera_no_print(){
+	#检查使用哪种设备
+	if [ -n "$(lsusb -d 2bc5:0403)" ]; then
+		CAMERATYPE="astrapro"
+	fi
+	if [ -n "$(lsusb -d 2bc5:0401)" ]; then
+		CAMERATYPE="astra"
+	fi
+	if [ -n "$(lsusb -d 8086:0b07)" ]; then
+		CAMERATYPE="d435"
+	fi
+}
+
+
 #检查摄像头设备
 check_camera(){
 
@@ -752,14 +767,49 @@ spark_dock(){
 }
 
 
-#让SPARK夺宝奇兵比赛用示例程序
+#hsv范围值查找
+spark_hsv_detection(){
+	echo -e "${Info}"
+	echo -e "${Info}hsv值自动查找"
+	ROSVER=`/usr/bin/rosversion -d`
+	PROJECTPATH=$(cd `dirname $0`; pwd)
+	source ${PROJECTPATH}/devel/setup.bash
+
+	echo -e "${Info}"
+	echo -e "${Info}请确定："
+	echo -e "${Info}       A.摄像头已反向向下安装好。机械臂正常上电。"
+	echo -e "${Info}       B.${Red_font_prefix}红色${Font_color_suffix}标定物已贴好在吸盘固定头正上方。"
+	echo -e "${Info}       C.机械臂正常上电。"
+	echo -e "${Info}退出请输入：Ctrl + c "
+	echo -e "${Info}"
+
+	echo -e "${Info}请选择比赛方式：
+	  ${Green_font_prefix}1.${Font_color_suffix} 获取吸盘上方hsv值
+	  ${Green_font_prefix}2.${Font_color_suffix} 获取颜色块hsv值,需要将颜色块放在图像的矩形框中
+	  ${Green_font_prefix}3.${Font_color_suffix} 退出请输入：Ctrl + c"
+	echo && stty erase ^? && read -p "请输入数字 [1-2]：" armnum
+	case "$armnum" in
+		1)
+		roslaunch spark_carry_object hsv_detection.launch camera_type_tel:=${CAMERATYPE} color:=${calibration}
+		;;
+		2)
+		roslaunch spark_carry_object hsv_detection.launch camera_type_tel:=${CAMERATYPE} color:=${color_block}
+		;;
+		*)
+		echo -e "${Error} 错误，请填入正确的数字"
+		;;
+	esac
+
+}
+
+#方块抓取示例程序
 spark_carry_game(){
 	echo -e "${Info}" 
 	echo -e "${Info}夺宝奇兵比赛用示例程序" 
 	ROSVER=`/usr/bin/rosversion -d`
 	PROJECTPATH=$(cd `dirname $0`; pwd)
 	source ${PROJECTPATH}/devel/setup.bash
-	echo -e "${Info}请选择比赛方式：
+	echo -e "${Info}请选择方式：
 	  ${Green_font_prefix}1.${Font_color_suffix} 手动模式
 	  ${Green_font_prefix}2.${Font_color_suffix} 自动模式
 	  ${Green_font_prefix}3.${Font_color_suffix} 退出请输入：Ctrl + c" 
@@ -992,6 +1042,23 @@ coming_soon(){
 }
 
 
+
+check_camera_game(){
+  if [[ "${GAME_ENABLE}" == "yes" ]]; then 
+	  check_camera_no_print
+	  if [[ "${CAMERATYPE}" == "d435" ]]; then
+		aa='a'
+	  else
+		echo -e "
+  ${Green_font_prefix} 13.${Font_color_suffix} hsv值自动查找"
+	  fi
+		echo -e "
+  ${Green_font_prefix} 20.${Font_color_suffix} 竞赛示例程序
+	  
+————————————"
+  fi
+}
+
 #printf
 menu_status(){
 	echo -e "${Tip} 当前系统版本 ${OSDescription} !" 
@@ -1043,10 +1110,9 @@ echo -e "
   ${Green_font_prefix} 11.${Font_color_suffix} 语音控制SPARK移动
   ${Green_font_prefix} 12.${Font_color_suffix} 给摄像头做标定
   
-  ${Green_font_prefix} 20.${Font_color_suffix} 比赛程序
-
-————————————
-
+————————————"
+check_camera_game
+echo -e "
   ${Green_font_prefix}100.${Font_color_suffix} 问题反馈
   ${Green_font_prefix}104.${Font_color_suffix} 文件传输
  "
@@ -1092,6 +1158,9 @@ case "$num" in
 	;;
 	12)
 	calibrate_camera
+	;;
+	13)
+	spark_hsv_detection
 	;;
 	20)
 	spark_carry_game

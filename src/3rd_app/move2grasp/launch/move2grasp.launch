@@ -51,7 +51,7 @@
 		</node>
 	</group>
 	<group if="$(eval arg('camera_type_tel')=='astrapro')">
-		<node pkg="move2grasp" type="grasp_pro.py" name="grasp" />
+		<node pkg="move2grasp" type="grasp_pro_new.py" name="grasp" />
 	</group>
 
 </launch>
