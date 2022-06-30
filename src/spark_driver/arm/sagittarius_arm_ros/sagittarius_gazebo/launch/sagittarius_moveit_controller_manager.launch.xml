@@ -1,0 +1,16 @@
+<launch>
+
+  <!-- loads moveit_controller_manager on the parameter server -->
+  <arg name="fake_execution"              default="false"/>
+
+
+  <group unless="$(arg fake_execution)">
+
+    <param name="moveit_controller_manager" value="moveit_simple_controller_manager/MoveItSimpleControllerManager"/>
+
+    <!-- loads controllers to the param server -->
+    <rosparam file="$(find sagittarius_gazebo)/config/controllers/sgr532_controllers.yaml"/>
+
+  </group>
+
+</launch>

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="$(arg robot_name)/base_link">
+    <material>Custom/sagittarius</material>
+  </gazebo>
+
+  <gazebo reference="$(arg robot_name)/link1">
+    <material>Custom/sagittarius</material>
+  </gazebo>
+
+  <gazebo reference="$(arg robot_name)/link2">
+    <material>Custom/sagittarius</material>
+  </gazebo>
+
+  <gazebo reference="$(arg robot_name)/link3">
+    <material>Custom/sagittarius</material>
+  </gazebo>
+
+  <gazebo reference="$(arg robot_name)/link4">
+    <material>Custom/sagittarius</material>
+  </gazebo>
+
+  <gazebo reference="$(arg robot_name)/link5">
+    <material>Custom/sagittarius</material>
+  </gazebo>
+
+  <gazebo reference="$(arg robot_name)/link6">
+    <material>Custom/sagittarius</material>
+  </gazebo>
+
+  <gazebo reference="$(arg robot_name)/link_gripper_left">
+    <material>Custom/sagittarius</material>
+  </gazebo>
+
+  <gazebo reference="$(arg robot_name)/link_gripper_right">
+    <material>Custom/sagittarius</material>
+  </gazebo>
+
+  <gazebo reference="$(arg robot_name)/ar_tag_link">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+  </gazebo>
+  <gazebo reference="$(arg robot_name)/link_grasping_frame">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+  </gazebo>
+
+</robot>

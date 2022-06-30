@@ -1,0 +1,14 @@
+material Custom/sagittarius
+{
+   technique
+   {
+      pass
+      {
+         texture_unit
+         {
+          texture sagittarius_black.png
+          scale 1 1
+         }
+      }
+   }
+}

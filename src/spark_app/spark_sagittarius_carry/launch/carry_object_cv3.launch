@@ -1,0 +1,40 @@
+<!-- NXROBO SPARK -->
+<launch>
+	<arg name="lidar_type_tel" default="3iroboticslidar2" doc="lidar type [3iroboticslidar2, ydlidar_g2]"/>
+	<!-- 摄像机类型 -->
+	<arg name="camera_type_tel" default="d435" doc="camera type [astrapro, astra, d435...]"/>
+	<!-- 机械臂 -->
+	<arg name="robot_name" default="sgr532"/>
+	<arg name="robot_model" default="$(arg robot_name)"/>
+
+	<!--Sagittarius 机械臂-->
+	<include file="$(find sagittarius_moveit)/launch/sgr532_moveit_in_spark.launch">
+		<arg name="use_rviz" value="false"/>
+	</include>
+	<node pkg="spark_sagittarius_carry" type="sgr_ctrl.py" name="sgr_ctrl_node" output="screen" ns="$(arg robot_name)"/>
+
+	<!--spark驱动，机器人描述，相机，底盘-->
+	<include file="$(find spark_bringup)/launch/driver_bringup.launch">
+		<arg name="camera_type_tel" value="$(arg camera_type_tel)" />
+		<arg name="enable_arm_tel" value="yes"/>
+		<arg name="arm_type_tel" value="sagittarius_arm"/>
+	</include>
+
+	<!--搬运物体 -->
+	<node pkg="spark_sagittarius_carry" type="s_s_carry_object_cv3.py" name="spark_sagittarius_carry_node" output="screen">
+		<remap from="/camera/rgb/image_raw" to="/camera/color/image_raw" if="$(eval arg('camera_type_tel')=='d435')"/>
+		<param name ="a_Pose" value = "0,0,0,0,0,0,1"/>
+		<param name ="b_Pose" value = "0.5,0.5,0,0,0,0,1"/>
+		<param name ="turnbody_min_z" value = "-0.2"/>
+		<param name ="turnbody_max_z" value = "0.2"/>
+		<param name ="hsv_config" value = "$(find spark_sagittarius_carry)/config/hsv.yaml"/>
+	</node>
+
+	<!--在rviz显示 -->
+	<arg name="rvizconfig" default="$(find spark_sagittarius_carry)/rviz/rviz_$(arg camera_type_tel).rviz" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+	<!--是否开始抓取 -->
+	<node pkg="spark_sagittarius_carry" type="cmd_spark_sgr_carry_start.sh" name="cscs" />
+
+</launch>

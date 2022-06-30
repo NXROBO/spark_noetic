@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: sagittarius_descriptions
+    relative_path: urdf/sgr532.urdf.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/sgr532.srdf
+  CONFIG:
+    author_name: litian.zhuang
+    author_email: litian.zhuang@nxrobo.com
+    generated_timestamp: 1650938167

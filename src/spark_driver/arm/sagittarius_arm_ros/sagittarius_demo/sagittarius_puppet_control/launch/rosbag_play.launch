@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch> 	
+  <arg name="robot_name"                default="sgr532"/>
+  <arg name="robot_model"               default="$(arg robot_name)"/>
+  <!---->
+  <include file="$(find sdk_sagittarius_arm)/launch/run_sagittarius.launch">
+    <arg name="robot_name"  value="$(arg robot_name)"/>
+    <arg name="robot_model" value="$(arg robot_model)"/>    
+  </include>
+  <!--是否开始 -->
+  <node pkg="sagittarius_puppet_control" type="rosbag_play.sh" name="pstc" />
+
+</launch>

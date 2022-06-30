@@ -45,7 +45,7 @@
 		<xacro:include filename="$(find spark_description)/urdf/sensors/spark_d435.urdf.xacro"/>
 	</xacro:if>
 	<xacro:if value="${robot_arm_type == 'sagittarius_arm' and enable_arm == 'yes'}">
-		<xacro:include filename="$(find sagittarius_descriptions)/urdf/spark_sagittarius_descriptions.urdf"/>  
+		<xacro:include filename="$(find spark_description)/urdf/spark_sagittarius_descriptions.urdf"/>  
 	</xacro:if>
 	<xacro:if value="${robot_arm_type == 'uarm' and enable_arm == 'yes'}">
 

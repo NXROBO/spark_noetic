@@ -1,0 +1,20 @@
+controller_list:
+  - name: fake_sagittarius_arm_controller
+    type: $(arg fake_execution_type)
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - joint5
+      - joint6
+  - name: fake_sagittarius_gripper_controller
+    type: $(arg fake_execution_type)
+    joints:
+      - joint_gripper_left
+      - joint_gripper_right
+initial:  # Define initial robot poses per group
+  - group: sagittarius_arm
+    pose: home
+  - group: sagittarius_gripper
+    pose: open

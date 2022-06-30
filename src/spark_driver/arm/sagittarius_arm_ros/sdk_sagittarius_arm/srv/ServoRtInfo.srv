@@ -1,0 +1,17 @@
+# Get servo realtime state
+# servo_id : 1~7
+
+uint8 servo_id
+
+---
+
+# return the realtime state
+# speed(50step/s)
+# payload(0.1%)
+# voltage(0.1V)
+# current(1mA)
+int16 speed
+int16 payload
+uint8 voltage
+uint16 current
+

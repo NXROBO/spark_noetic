@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="robot_name"                default="sgr532"/>
+  <arg name="robot_model"               default="$(arg robot_name)"/>
+  <arg name="bag_name"                  default="record"/>
+  <arg name="arm_run"                   default="true"/>
+  <arg name="joint_pub_gui"		          default="false"/>
+  <arg name="use_joint_pub"		          default="true"/>
+  <include if="$(arg arm_run)" file="$(find sdk_sagittarius_arm)/launch/run_sagittarius.launch">
+    <arg name="robot_name"      value="$(arg robot_name)"/>
+    <arg name="robot_model"     value="$(arg robot_model)"/>    
+  	<arg name="use_joint_pub"		value="$(arg use_joint_pub)"/>
+	  <arg name="joint_pub_gui"		value="$(arg joint_pub_gui)"/>
+  </include>
+
+  <node
+    name="puppet_control_single_node"
+    pkg="sagittarius_puppet_control"
+    type="puppet_control_single_node"
+    respawn="false"
+    output="screen"
+    ns="$(arg robot_name)">
+  </node>
+
+  <node
+    name="rosbag_record_commands"
+    pkg="rosbag"
+    type="record"
+    args="record -O $(find sagittarius_puppet_control)/bag/$(arg bag_name) /$(arg robot_name)/joint/commands /$(arg robot_name)/gripper/command"/>
+
+</launch>

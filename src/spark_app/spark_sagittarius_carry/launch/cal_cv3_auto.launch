@@ -1,0 +1,43 @@
+<!--
+  机械臂与摄像头之间的校准功能。
+ -->
+<launch>
+  <!-- Camera -->
+  <arg name="camera_type_tel" default="d435" doc="camera type [astrapro, astra, d435...]"/>
+  <!-- 机械臂 -->
+  <arg name="robot_name" default="sgr532"/>
+  <arg name="robot_model" default="$(arg robot_name)"/>
+  <arg name="fast_mode" default="true"/>
+
+  <!--Sagittarius 机械臂-->
+  <include file="$(find sagittarius_moveit)/launch/sgr532_moveit_in_spark.launch">
+    <arg name="use_rviz" value="false"/>
+  </include>
+  <node pkg="spark_sagittarius_carry" type="sgr_ctrl.py" name="sgr_ctrl_node" output="screen" ns="$(arg robot_name)"/>
+
+  <!--spark驱动，机器人描述，相机，底盘-->
+  <include file="$(find spark_bringup)/launch/driver_bringup.launch">
+    <arg name="camera_type_tel" value="$(arg camera_type_tel)" />
+    <arg name="enable_arm_tel" value="yes"/>
+    <arg name="arm_type_tel" value="sagittarius_arm"/>
+  </include>
+
+  <!--摄像头订阅与视觉定位-->
+  <node pkg="spark_sagittarius_carry" type="cali_cam_cv3.py" name="cali_cam_cv3_node" output="screen">
+    <remap from="/camera/rgb/image_raw" to="/camera/color/image_raw" if="$(eval arg('camera_type_tel')=='d435')"/>
+    <param name ="hsv_config" value = "$(find spark_sagittarius_carry)/config/hsv.yaml"/>
+    <param name="fast_mode" value="$(arg fast_mode)" />
+  </node>
+
+  <!--控制机械臂的定点移动-->
+  <node pkg="spark_sagittarius_carry" type="cali_pos_auto.py" name="cali_pos_node" output="screen">
+    <param name="arm_name" value="$(arg robot_name)" />
+    <param name="fast_mode" value="$(arg fast_mode)" />
+  </node>
+  <!--在rviz显示-->
+  <!--<arg name="rvizconfig" default="$(find spark_sagittarius_carry)/rviz/carry_object_$(arg camera_type_tel).rviz" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true"/>-->
+
+  <!--是否开始 -->
+  <node pkg="spark_sagittarius_carry" type="publish_start_to_cali_auto.sh" name="pstc"/>
+</launch>

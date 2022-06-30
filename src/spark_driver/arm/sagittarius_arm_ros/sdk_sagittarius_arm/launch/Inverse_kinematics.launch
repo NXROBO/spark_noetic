@@ -1,0 +1,14 @@
+<!--Inverse_kinematics demo-->
+<launch> 	
+  <arg name="robot_name"                default="sgr532"/>
+
+  <!--sagittarius_moveit-->
+  <include file="$(find sagittarius_moveit)/launch/demo_true.launch">
+      <arg name="robot_name"    value="$(arg robot_name)"/>
+  </include>
+
+  <!--Forward_kinematics-->
+  <node pkg="sdk_sagittarius_arm" type="Inverse_kinematics.py" name="Inverse_kinematics" output="screen" ns="$(arg robot_name)">
+  </node>
+
+</launch>

@@ -1,0 +1,117 @@
+<launch>
+
+  <arg name="robot_model_master"              default="sgr532"/>
+  <arg name="master_port"                     default="/dev/ttyACM0"/>
+  <arg name="robot_model_slaver"              default="sgr532"/>
+  <arg name="slaver1_port"                    default="/dev/ttyACM1"/>
+  <arg name="slaver2_port"                    default="/dev/ttyACM2"/>
+  <arg name="slaver3_port"                    default="/dev/ttyACM3"/>
+  <arg name="slaver4_port"                    default="/dev/ttyACM4"/>
+
+  <arg name="rvizconfig"                      default="$(find sagittarius_puppet_control)/rviz/puppet_config.rviz" />
+  <arg name="arm_run"                         default="true"/>
+  <arg name="use_default_rviz"                default="false"/>
+
+  <arg name="slaver_robot_num"                default="4"/>
+
+  <arg name="robot_name_master" value="master/$(arg robot_model_master)"/>
+  <arg name="robot_name_slaver1" value="slaver1/$(arg robot_model_slaver)"/>
+  <arg name="robot_name_slaver2" value="slaver2/$(arg robot_model_slaver)"/>
+  <arg name="robot_name_slaver3" value="slaver3/$(arg robot_model_slaver)"/>
+  <arg name="robot_name_slaver4" value="slaver4/$(arg robot_model_slaver)"/>
+
+  <include if="$(arg arm_run)" file="$(find sdk_sagittarius_arm)/launch/run_sagittarius.launch">
+    <arg name="robot_name"                    value="$(arg robot_name_master)"/>
+    <arg name="robot_model"                   value="$(arg robot_model_master)"/>
+    <arg name="serialname"                    value="$(arg master_port)"/>
+    <arg name="use_default_rviz"              value="$(arg use_default_rviz)"/>
+    <arg name="use_world_frame"               value="false"/>
+  </include>
+
+  <include if="$(arg arm_run)" file="$(find sdk_sagittarius_arm)/launch/run_sagittarius.launch">
+    <arg name="robot_name"                    value="$(arg robot_name_slaver1)"/>
+    <arg name="robot_model"                   value="$(arg robot_model_slaver)"/>
+    <arg name="serialname"                    value="$(arg slaver1_port)"/>
+    <arg name="use_default_rviz"              value="$(arg use_default_rviz)"/>
+    <arg name="use_world_frame"               value="false"/>
+  </include>
+
+  <include if="$(arg arm_run)" file="$(find sdk_sagittarius_arm)/launch/run_sagittarius.launch">
+    <arg name="robot_name"                    value="$(arg robot_name_slaver2)"/>
+    <arg name="robot_model"                   value="$(arg robot_model_slaver)"/>
+    <arg name="serialname"                    value="$(arg slaver2_port)"/>
+    <arg name="use_default_rviz"              value="$(arg use_default_rviz)"/>
+    <arg name="use_world_frame"               value="false"/>
+  </include>
+
+  <include if="$(arg arm_run)" file="$(find sdk_sagittarius_arm)/launch/run_sagittarius.launch">
+    <arg name="robot_name"                    value="$(arg robot_name_slaver3)"/>
+    <arg name="robot_model"                   value="$(arg robot_model_slaver)"/>
+    <arg name="serialname"                    value="$(arg slaver3_port)"/>
+    <arg name="use_default_rviz"              value="$(arg use_default_rviz)"/>
+    <arg name="use_world_frame"               value="false"/>
+  </include>
+
+  <include if="$(arg arm_run)" file="$(find sdk_sagittarius_arm)/launch/run_sagittarius.launch">
+    <arg name="robot_name"                    value="$(arg robot_name_slaver4)"/>
+    <arg name="robot_model"                   value="$(arg robot_model_slaver)"/>
+    <arg name="serialname"                    value="$(arg slaver4_port)"/>
+    <arg name="use_default_rviz"              value="$(arg use_default_rviz)"/>
+    <arg name="use_world_frame"               value="false"/>
+  </include>
+
+  <node
+    name="puppet_control_node"
+    pkg="sagittarius_puppet_control"
+    type="puppet_control_node"
+    respawn="false"
+    output="screen">
+    <param name="robot_name_master" value="$(arg robot_name_master)"/>
+    <param name="robot_name_slaver1" value="$(arg robot_name_slaver1)"/>
+    <param name="robot_name_slaver2" value="$(arg robot_name_slaver2)"/>
+    <param name="robot_name_slaver3" value="$(arg robot_name_slaver3)"/>
+    <param name="robot_name_slaver4" value="$(arg robot_name_slaver4)"/>
+
+    <param name="slaver_robot_num" value="$(arg slaver_robot_num)"/>
+
+    
+  </node>
+
+  <node
+    name="robot_1_transform_broadcaster"
+    pkg="tf2_ros"
+    type="static_transform_publisher"
+    args="0 -0.3 0 0 0 0 /world /$(arg robot_name_master)/base_link"/>
+
+  <node
+    name="robot_2_transform_broadcaster"
+    pkg="tf2_ros"
+    type="static_transform_publisher"
+    args="0 0.3 0 0 0 0 /world /$(arg robot_name_slaver1)/base_link"/>
+
+  <node
+    name="robot_3_transform_broadcaster"
+    pkg="tf2_ros"
+    type="static_transform_publisher"
+    args="0 0.9 0 0 0 0 /world /$(arg robot_name_slaver2)/base_link"/>
+
+  <node
+    name="robot_4_transform_broadcaster"
+    pkg="tf2_ros"
+    type="static_transform_publisher"
+    args="0 1.5 0 0 0 0 /world /$(arg robot_name_slaver3)/base_link"/>
+
+  <node
+    name="robot_5_transform_broadcaster"
+    pkg="tf2_ros"
+    type="static_transform_publisher"
+    args="0 2.1 0 0 0 0 /world /$(arg robot_name_slaver4)/base_link"/>
+
+  <node
+    name="rviz"
+    pkg="rviz"
+    type="rviz"
+    args="-d $(arg rvizconfig)"
+    required="true"/>
+
+</launch>

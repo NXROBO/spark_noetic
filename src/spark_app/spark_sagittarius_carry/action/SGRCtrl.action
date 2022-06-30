@@ -1,0 +1,50 @@
+# Define the goal
+
+# grasp_type 参数的定义项
+# 设置当前夹爪状态，在动作执行之前设置
+uint8 GRASP_NONE = 0 # 自定义动作下使用，夹爪不做处理
+uint8 GRASP_OPEN = 1 # 打开夹爪, 放下动作
+uint8 GRASP_CLOSE = 2 # 闭合夹爪, 抓取动作
+
+# action_type 参数的定义项
+# 需要执行动作的类型，可以指定末端姿态或者自动计算
+# 自定义姿态：是让机械臂到某个目标点
+# 预设动作：是执行某个预设的一系列动作
+uint8 ACTION_TYPE_XYZ = 0 # 自定义姿态：末端姿态使用动态计算
+uint8 ACTION_TYPE_XYZ_RPY = 1 # 自定义姿态：末端姿态使用给定姿态
+uint8 ACTION_TYPE_DEFINE_STAY = 2 # 预设动作：待机状态
+uint8 ACTION_TYPE_PICK_XYZ = 3 # 预设动作：XYZ拾取动作
+uint8 ACTION_TYPE_PICK_XYZ_RPY = 4 # 预设动作：XYZ+RPY拾取动作
+uint8 ACTION_TYPE_PUT_XYZ = 5 # 预设动作：XYZ放下动作
+uint8 ACTION_TYPE_PUT_XYZ_RPY = 6 # 预设动作：XYZ+RPY放下动作
+
+uint8 grasp_type  # 末端初始化状态
+uint8 action_type  # 动作类型
+
+# 目标点位置
+float64 pos_x
+float64 pos_y
+float64 pos_z
+float64 pos_roll
+float64 pos_pitch
+float64 pos_yaw
+
+---
+# Define the result
+uint8 SUCCESS = 0
+uint8 ERROR = 1
+uint8 PREEMPT = 2
+uint8 PLAN_NOT_FOUND = 3
+uint8 GRASP_FAILD = 4 # 抓空
+
+# 执行结果
+uint8 result
+
+---
+# Define a feedback message
+uint8 PLANNING = 0
+uint8 EXEC_POSITION = 1
+uint8 EXEC_GRASP = 2
+
+# 当前步骤
+uint8 step

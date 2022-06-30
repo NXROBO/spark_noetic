@@ -10,6 +10,7 @@ export PATH
 #=================================================
 
 GAME_ENABLE="no"
+ADV_GAME_ENABLE="no"
 sh_ver="2.0"
 filepath=$(cd "$(dirname "$0")"; pwd)
 Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Yellow_background_prefix="\033[43;37m" && Font_color_suffix="\033[0m" && Yellow_font_prefix="\e[1;33m" && Blue_font_prefix="\e[0;34m"
@@ -314,7 +315,18 @@ install_spark(){
 	#catkin_make install
 }
 
-
+#安装sagittarius机械臂的提示信息
+install_sgr_msg(){
+	echo -e "${Info}没有找到sagittarius_moveit, sagittarius_arm_ros未安装?"
+	echo -e "${Info}"
+	echo -e "${Info}执行下列指令安装sagittarius_arm_ros, 假设Spark的工作空间路径为~/spark_noetic"
+	echo -e "${Info}"
+	echo -e "${Info}cd ~/spark_noetic/src/spark_driver/arm" 
+	echo -e "${Info}git clone https://github.com/NXROBO/sagittarius_ws.git"
+	echo -e "${Info}rm ./sagittarius_ws/src/CMakeLists.txt"
+	echo -e "${Info}cd ~/spark_noetic && catkin_make"
+	echo -e "${Info}"
+}
 
 
 #远程设置
@@ -452,14 +464,11 @@ voice_nav(){
 
 }
 
-#机械臂与摄像头匹对标定
-cal_camera_arm(){
-	echo -e "${Info}" 
-	echo -e "${Info}机械臂与摄像头匹对标定" 
+#机械臂与摄像头匹对标定uArm 
+cal_camera_arm_uarm(){
 	ROSVER=`/usr/bin/rosversion -d`
 	PROJECTPATH=$(cd `dirname $0`; pwd)
 	source ${PROJECTPATH}/devel/setup.bash
-
 	echo -e "${Info}" 
 	echo -e "${Info}请确定："
 	echo -e "${Info}       A.摄像头已反向向下安装好。机械臂正常上电。"
@@ -471,21 +480,88 @@ cal_camera_arm(){
 	if [ $ROSVER = "kinetic" ]; then
 		echo -e "${Info}It is kinetic." 
 		print_command "roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
-	  	roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
+		roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 	elif [ $ROSVER = "indigo" ]; then
 		echo -e "${Info}It is indigo." 
 		print_command "roslaunch spark_carry_object spark_carry_cal_cv2.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
-	  	roslaunch spark_carry_object spark_carry_cal_cv2.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
+		roslaunch spark_carry_object spark_carry_cal_cv2.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 	elif [ $ROSVER = "melodic" ]; then
 		echo -e "${Info}It is melodic." 
 		print_command "roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
-	  	roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
+		roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 	elif [ $ROSVER = "noetic" ]; then
 		echo -e "${Info}It is melodic." 
 		print_command "roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
-	  	roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
+		roslaunch spark_carry_object spark_carry_cal_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}
 	fi
-		
+}
+
+#机械臂与摄像头匹对标定 sagittarius
+cal_camera_arm_sgr(){
+	ROSVER=`/usr/bin/rosversion -d`
+	PROJECTPATH=$(cd `dirname $0`; pwd)
+	source ${PROJECTPATH}/devel/setup.bash
+
+	if [ -n "$(roscd sagittarius_moveit)" ]; then
+		install_sgr_msg
+	else
+		echo -e "${Info} " 
+		echo -e "${Info} 请确定："
+		echo -e "${Info}       A.摄像头已反向向下安装好。"
+		echo -e "${Info}       B.机械臂正常上电。" 
+		echo -e "${Info} 退出请输入：Ctrl + c " 
+		echo -e "${Info} "
+		echo -e "${Info} 请选择标定模式："
+		echo -e "${Info} 1.自动模式(简易版)"
+		echo -e "${Info} 2.自动模式"
+		echo -e "${Info} 3.手动模式"
+		echo && stty erase ^? && read -p "请输入数字 [1-3]：" calinum
+		case "$calinum" in
+			1)
+			print_command "roslaunch spark_sagittarius_carry cal_cv3_auto.launch camera_type_tel:=${CAMERATYPE}"
+			roslaunch spark_sagittarius_carry cal_cv3_auto.launch camera_type_tel:=${CAMERATYPE}
+			;;
+			2)
+			print_command "roslaunch spark_sagittarius_carry cal_cv3_auto.launch camera_type_tel:=${CAMERATYPE} fast_mode:=false"
+			roslaunch spark_sagittarius_carry cal_cv3_auto.launch camera_type_tel:=${CAMERATYPE} fast_mode:=false
+			;;
+			3)print_command "roslaunch spark_sagittarius_carry cal_cv3.launch camera_type_tel:=${CAMERATYPE}"
+			roslaunch spark_sagittarius_carry cal_cv3.launch camera_type_tel:=${CAMERATYPE}
+			;;
+			*)
+			echo -e "${Error} 错误，默认使用自动模式"
+			print_command "roslaunch spark_sagittarius_carry cal_cv3_auto.launch camera_type_tel:=${CAMERATYPE}"
+			roslaunch spark_sagittarius_carry cal_cv3_auto.launch camera_type_tel:=${CAMERATYPE}
+			;;
+		esac
+	fi
+}
+
+#机械臂与摄像头匹对标定
+cal_camera_arm(){
+	echo -e "${Info} " 
+	echo -e "${Info} 机械臂与摄像头匹对标定" 
+	ROSVER=`/usr/bin/rosversion -d`
+	PROJECTPATH=$(cd `dirname $0`; pwd)
+	source ${PROJECTPATH}/devel/setup.bash
+
+	echo -e "${Info} " 
+	echo -e "${Info} 请选择机械臂："
+	echo -e "${Info} 1.Sagittarius"
+	echo -e "${Info} 2.uArm"
+	echo && stty erase ^? && read -p "请输入数字 [1-2]：" armnum
+
+	case "$armnum" in
+		1)
+		cal_camera_arm_sgr
+		;;
+		2)
+		cal_camera_arm_uarm
+		;;
+		*)
+		echo -e "${Error} 错误，请选择正确的机械臂"
+		;;
+	esac
 }
 
 
@@ -648,10 +724,9 @@ spark_intel_movidius(){
 		exit	
 	fi
 }
-#让SPARK通过机械臂进行视觉抓取
-spark_carry_obj(){
-	echo -e "${Info}" 
-	echo -e "${Info}让SPARK通过机械臂进行视觉抓取" 
+
+#让SPARK通过机械臂进行视觉抓取 uarm
+spark_carry_obj_uarm(){
 	ROSVER=`/usr/bin/rosversion -d`
 	PROJECTPATH=$(cd `dirname $0`; pwd)
 	source ${PROJECTPATH}/devel/setup.bash
@@ -697,7 +772,66 @@ spark_carry_obj(){
 		print_command "roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
 	  	roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}	
 	fi
+}
+
+#让SPARK通过机械臂进行视觉抓取 uarm
+spark_carry_obj_sgr(){
+	ROSVER=`/usr/bin/rosversion -d`
+	PROJECTPATH=$(cd `dirname $0`; pwd)
+	source ${PROJECTPATH}/devel/setup.bash
+	echo -e "${Info}请选择移动的方式：
+	  ${Green_font_prefix}1.${Font_color_suffix} 固定位置移动
+	  ${Green_font_prefix}2.${Font_color_suffix} 手动地图指定位置导航(未完成。。)
+	  ${Green_font_prefix}3.${Font_color_suffix} 退出请输入：Ctrl + c" 
+	echo && stty erase ^? && read -p "请输入数字 [1-2]：" armnum
+	case "$armnum" in
+		1)
+		MOVETYPE="fix"
+		;;
+		2)
+		MOVETYPE="slam"
+		;;
+		*)
+		echo -e "${Error} 错误，默认使用固定位置移动"
+		MOVETYPE="fix"
+		;;
+	esac
+	echo -e "${Info}" 
+	echo -e "${Info}请确定："
+	echo -e "${Info}       A.机械臂正常上电。"
+	echo -e "${Info}       B.准备好可与标定方块同样颜色的物品。" 
+	echo -e "${Info}退出请输入：Ctrl + c " 
+	echo -e "${Info}" 
+	echo && stty erase ^? && read -p "按回车键（Enter）开始：" 
+	print_command "roslaunch spark_sagittarius_carry carry_object_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}"
+	roslaunch spark_sagittarius_carry carry_object_cv3.launch camera_type_tel:=${CAMERATYPE} lidar_type_tel:=${LIDARTYPE}	
+}
+
+#让SPARK通过机械臂进行视觉抓取
+spark_carry_obj(){
+	echo -e "${Info}" 
+	echo -e "${Info}让SPARK通过机械臂进行视觉抓取" 
+	ROSVER=`/usr/bin/rosversion -d`
+	PROJECTPATH=$(cd `dirname $0`; pwd)
+	source ${PROJECTPATH}/devel/setup.bash
 	
+	echo -e "${Info} " 
+	echo -e "${Info} 请选择机械臂："
+	echo -e "${Info} 1.Sagittarius"
+	echo -e "${Info} 2.uArm"
+	echo && stty erase ^? && read -p "请输入数字 [1-2]：" armnum
+
+	case "$armnum" in
+		1)
+		spark_carry_obj_sgr
+		;;
+		2)
+		spark_carry_obj_uarm
+		;;
+		*)
+		echo -e "${Error} 错误，请选择正确的机械臂"
+		;;
+	esac
 }
 
 #让SPARK使用激光雷达绘制地图(gmapping)
@@ -825,6 +959,54 @@ spark_carry_game(){
 		echo -e "${Error} 错误，请填入正确的数字"
 		;;
 	esac	
+}
+
+#进阶赛示例程序
+spark_sgr_game(){
+	
+	ROSVER=`/usr/bin/rosversion -d`
+	PROJECTPATH=$(cd `dirname $0`; pwd)
+	source ${PROJECTPATH}/devel/setup.bash
+	if [ -n "$(roscd spark_match)" ]; then
+		echo -e "${Info}没有找到进阶赛的示例程序"
+	elif [ -n "$(roscd sagittarius_moveit)" ]; then
+		install_sgr_msg
+	else
+		echo -e "${Info}" 
+		echo -e "${Info}进阶赛比赛示例程序" 
+		echo -e "${Info}请选择方式：
+	${Green_font_prefix}1.${Font_color_suffix} 建图
+	${Green_font_prefix}2.${Font_color_suffix} 控制Spark记录地点
+	${Green_font_prefix}3.${Font_color_suffix} USB摄像头标定(只需要标定一次)
+	${Green_font_prefix}4.${Font_color_suffix} 运行拾取示例程序
+	${Green_font_prefix}5.${Font_color_suffix} 运行进阶赛示例程序
+	${Green_font_prefix}6.${Font_color_suffix} 退出请输入：Ctrl + c" 
+		echo && stty erase ^? && read -p "请输入数字 [1-5]：" armnum
+		case "$armnum" in
+			1)
+			roslaunch spark_match spark_match_map.launch 
+			;;
+			2)
+			gnome-terminal -x bash -c "rosrun spark_match semantic_map.sh"
+			roslaunch spark_match spark_match_nav.launch enable_arm_tel:="no"
+			;;
+			3)
+			gnome-terminal -x bash -c "rosrun spark_match usb_cam_cali.sh"
+			roslaunch spark_match usb_cam.launch
+			;;
+			4)
+			gnome-terminal -x bash -c "rosrun spark_match pickup_demo.sh"
+			roslaunch spark_match spark_match_nav.launch
+			;;
+			5)
+			gnome-terminal -x bash -c "rosrun spark_match run_demo.sh"
+			roslaunch spark_match spark_match_nav.launch
+			;;
+			*)
+			echo -e "${Error} 错误，请填入正确的数字"
+			;;
+		esac	
+	fi
 }
 
 
@@ -1053,8 +1235,16 @@ check_camera_game(){
   ${Green_font_prefix} 13.${Font_color_suffix} hsv值自动查找"
 	  fi
 		echo -e "
-  ${Green_font_prefix} 20.${Font_color_suffix} 竞赛示例程序
-	  
+  ${Green_font_prefix} 20.${Font_color_suffix} 竞赛示例程序"
+  fi
+
+  if [[ "${ADV_GAME_ENABLE}" == "yes" ]]; then
+	  echo -e "
+  ${Green_font_prefix} 21.${Font_color_suffix} 进阶赛示例程序"
+  fi
+
+  if [[ "${GAME_ENABLE}" == "yes" ]] || [[ "${ADV_GAME_ENABLE}" == "yes" ]]; then
+	  echo -e "
 ————————————"
   fi
 }
@@ -1164,6 +1354,9 @@ case "$num" in
 	;;
 	20)
 	spark_carry_game
+	;;
+	21)
+	spark_sgr_game
 	;;
 	100)
 	tell_us

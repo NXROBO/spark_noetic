@@ -1,0 +1,42 @@
+<launch>
+  <arg name="robot_name" default="sgr532"/>
+  <arg name="robot_model" default="$(arg robot_name)"/>
+  <arg name="controller_dev" default="/dev/input/js0"/>
+  <arg name="controller_type" default="xbox360"/>
+  <arg name="topic_joy_raw" default="/commands/joy_raw"/>
+  <arg name="threshold" default="0.75"/>
+
+  <include file="$(find sdk_sagittarius_arm)/launch/rviz_control_sagittarius.launch">
+    <arg name="robot_name" value="$(arg robot_name)" />
+    <arg name="robot_model" value="$(arg robot_model)" />
+    <arg name="arm_velocity" value="2048" />
+    <arg name="arm_acceleration" value="10" />
+    <arg name="servo_torque1" default="600"/>
+    <arg name="servo_torque2" default="600"/>
+    <arg name="servo_torque3" default="600"/>
+    <arg name="servo_torque4" default="600"/>
+    <arg name="servo_torque5" default="600"/>
+    <arg name="servo_torque6" default="600"/>
+    <arg name="servo_torque7" default="200"/>
+    <arg name="joint_pub_gui" value="false" />
+    <arg name="use_joint_pub"		value="true"/>
+    <arg name="just_rviz_control"		value="false"/>
+  </include>
+
+  <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+    <param name="dev" value="$(arg controller_dev)" />
+    <remap from="joy" to="commands/joy_raw"/>
+  </node>
+
+  <include file="$(find sagittarius_joy)/launch/joy.launch">
+    <arg name="robot_name" value="$(arg robot_name)" />
+    <arg name="controller" value="$(arg controller_type)" />
+    <arg name="topic_joy_raw" value="$(arg topic_joy_raw)" />
+    <param name="threshold" value="$(arg threshold)"/>
+  </include>
+
+  
+
+
+
+</launch>

@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="robot_name"                default="sgr532"/>
+  <arg name="robot_model"               default="$(arg robot_name)"/>
+  <arg name="serialname"                default="/dev/sagittarius"/>
+
+  <!--  
+    The setting of velocity and acceleration is the internal parameter of the 
+    servo. If you are using moveit to planning, You need to modify the joint 
+    parameters of moveit planning at the same time. Ensure that moveit uses the
+    correct servo motion values for planning.
+
+    The joint parameters of moveit planning save in a YAML file. The file path 
+    is sagittarius_moveit/config/joint_limits.yaml.
+
+
+    The two sets of parameters use different units, and the following formula 
+    can be used for conversion.
+
+    If velocity is 3.14rad/s(180 degree/s): 
+        joint_limits.yaml: max_velocity       this file: arm_velocity
+                                3.14 rad/s = 2048 step/s
+
+    If acceleration is 1.57rad/s^2(90 degree/s^2): 
+        joint_limits.yaml: max_acceleration       this file: arm_acceleration
+                                1.57 rad/s^2 = 1024 step/s^2 = 10.24 100step/s^2
+
+    arm_velocity and arm_acceleration uses only integer parts.
+   -->
+  <arg name="arm_velocity"              default="2048"/>
+  <arg name="arm_acceleration"          default="10"/>
+
+  <!-- 
+    Each servo torque can be set individually, the range is 0~1000
+
+    If the torque is too low, the speed will be reduced, and the actual 
+    trajectory of the final robot arm may not be the same as planned.Excessive 
+    torque is a safety hazard
+
+    The default value is chosen based on security. Appropriately increase 
+    the torque to improve the trajectory fit
+   -->
+  <arg name="servo_torque1"             default="300"/>
+  <arg name="servo_torque2"             default="300"/>
+  <arg name="servo_torque3"             default="300"/>
+  <arg name="servo_torque4"             default="200"/>
+  <arg name="servo_torque5"             default="300"/>
+  <arg name="servo_torque6"             default="200"/>
+  <arg name="servo_torque7"             default="100"/>
+  <arg name="joint_pub_gui"             default="false"/>
+  <arg name="use_joint_pub"             default="true"/>
+  <arg name="just_rviz_control"         default="false"/>
+  <arg name="use_default_rviz"          default="true"/>
+  <arg name="use_world_frame"           default="true"/>
+
+  <include file="$(find sagittarius_descriptions)/launch/description.launch">
+    <arg name="robot_name"          value="$(arg robot_name)"/>
+    <arg name="robot_model"         value="$(arg robot_model)"/>  
+  	<arg name="use_joint_pub"		    value="$(arg use_joint_pub)"/>
+    <arg name="joint_pub_gui"		    value="$(arg joint_pub_gui)"/>
+    <arg name="use_default_rviz"		value="$(arg use_default_rviz)"/>
+    <arg name="use_world_frame"     value="$(arg use_world_frame)"/>
+
+  </include>
+
+
+  <node name="sdk_sagittarius_arm" pkg="sdk_sagittarius_arm" type="sdk_sagittarius_arm" respawn="true" output="screen" ns="$(arg robot_name)">
+      <param name="robot_name"    value="$(arg robot_name)"/>
+      <param name="robot_model"   value="$(arg robot_model)"/>  
+      <param name="arm_velocity"  value="$(arg arm_velocity)"/>
+      <param name="arm_acceleration"  value="$(arg arm_acceleration)"/>
+      <param name="servo_torque1" value="$(arg servo_torque1)"/>
+      <param name="servo_torque2" value="$(arg servo_torque2)"/>
+      <param name="servo_torque3" value="$(arg servo_torque3)"/>
+      <param name="servo_torque4" value="$(arg servo_torque4)"/>
+      <param name="servo_torque5" value="$(arg servo_torque5)"/>
+      <param name="servo_torque6" value="$(arg servo_torque6)"/>
+      <param name="servo_torque7" value="$(arg servo_torque7)"/>
+      <param name="serialname"  value="$(arg serialname)"/>
+      <param name="baudrate" type="string" value="1000000" />
+      <param name="timelimit" type="int" value="5000" />
+      <param name="servo_configs" type="string" value="$(find sdk_sagittarius_arm)/cfg/"/>
+      <param name="just_rviz_control"	type="bool"	value="$(arg just_rviz_control)"/>
+      <param name="servo_control_trajectory" type="bool" value="false" />
+  </node>
+</launch>

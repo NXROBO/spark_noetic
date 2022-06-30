@@ -1,0 +1,39 @@
+<launch>
+
+  <arg name="robot_name"                         default="sgr532"/>
+  <arg name="robot_model"                        default="$(arg robot_name)"/>
+
+
+
+  <arg name="use_pid_cntlrs"                     default="false"/>
+  <arg name="use_world_frame"                    default="true"/>
+  <arg name="external_urdf_loc"                  default=""/>
+  <arg name="external_srdf_loc"                  default=""/>
+  <arg name="rviz_frame"                         default="world"/>
+  <arg name="use_gazebo"                         default="true"/>
+  <arg name="use_actual"                         default="false"/>
+  <arg name="use_fake"                           default="false"/>
+
+  <include if="$(arg use_gazebo)" file="$(find sagittarius_gazebo)/launch/gazebo.launch">
+    <arg name="robot_name"                       value="$(arg robot_name)"/>
+    <arg name="robot_model"                      value="$(arg robot_model)"/>
+    <arg name="use_world_frame"                  value="$(arg use_world_frame)"/>
+    <arg name="external_urdf_loc"                value="$(arg external_urdf_loc)"/>
+  </include>
+
+
+
+  <include file="$(find sagittarius_gazebo)/launch/move_group.launch" ns="$(arg robot_name)">
+    <arg name="robot_name"                       value="$(arg robot_name)"/>
+    <arg name="robot_model"                      value="$(arg robot_model)"/>
+    <arg name="external_srdf_loc"                value="$(arg external_srdf_loc)"/>
+    <arg name="fake_execution"                   value="$(arg use_fake)"/>
+    <arg name="publish_monitored_planning_scene" value="true" />
+  </include>
+
+  <include file="$(find sagittarius_gazebo)/launch/moveit_rviz.launch" ns="$(arg robot_name)">
+    <arg name="rviz_frame"                       value="$(arg rviz_frame)"/>
+    <arg name="config"                           value="true"/>
+  </include>
+
+</launch>
