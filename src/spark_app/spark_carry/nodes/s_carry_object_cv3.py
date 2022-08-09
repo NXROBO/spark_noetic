@@ -245,7 +245,7 @@ class ReleaseObject(State):
         # go forward
         pos.x = 200
         pos.y = 0
-        pos.z = -40  #-80
+        pos.z = -38  #-80
         pub1.publish(pos)
         r1.sleep()
 
