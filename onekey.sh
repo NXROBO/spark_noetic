@@ -343,10 +343,11 @@ master_uri_setup(){
 		local_ip=$eth_ip
 	elif [ $wlo1_ip ]; then
 		echo -e "${Info}使用无线网络wlo1" 
-	  	local_ip=$wlo1
+	  	local_ip=$wlo1_ip
 	elif [ $wlp1s_ip ]; then
 		echo -e "${Info}使用无线网络wlp1s0" 
 	  	local_ip=$wlp1s_ip
+
 	elif [ $wlp2s_ip ]; then
 		echo -e "${Info}使用无线网络wlp2s0" 
 	  	local_ip=$wlp2s_ip
