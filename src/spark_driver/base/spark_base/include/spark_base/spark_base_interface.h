@@ -112,7 +112,7 @@ namespace nxsparkbase
 #define SPARKBASE_MAX_RADIUS_MM 2000
 
 //! Sparkbase max encoder counts
-#define SPARKBASE_MAX_ENCODER_COUNTS 0xFFFFFFF
+#define SPARKBASE_MAX_ENCODER_COUNTS 0xFFFFFFFF
 //! Sparkbase encoder pulses to meter constant
 #define SPARKBASE_PULSES_TO_M 0.00028885
 #define SPARKBASE_PULSES_TO_MM 0.28885

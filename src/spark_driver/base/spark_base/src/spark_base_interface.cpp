@@ -344,60 +344,79 @@ int nxsparkbase::OpenInterface::parseSenseState(unsigned char *buffer, int index
 
 int nxsparkbase::OpenInterface::parseRightEncoderCounts(unsigned char *buffer, int index)
 {
+    int encoder_counts_right_tmp;
   // Right encoder counts
   unsigned int right_encoder_counts = buffer2unsigned_int(buffer, index);
   right_encoder_counts = -right_encoder_counts;
-  //    printf("Right Encoder: %d,%d,%d\n",
-  //    right_encoder_counts,last_encoder_counts_[RIGHT],right_encoder_counts-last_encoder_counts_[RIGHT]);
+//      printf("Right Encoder: %d,%d,%d\n",
+//      right_encoder_counts,last_encoder_counts_[RIGHT],right_encoder_counts-last_encoder_counts_[RIGHT]);
 
   if (is_first_time_right ||
       right_encoder_counts == last_encoder_counts_[RIGHT])  // First time, we need 2 to make it work!
   {
-    encoder_counts_[RIGHT] = 0;
+    encoder_counts_right_tmp = 0;
     is_first_time_right = false;
   }
   else
   {
-    encoder_counts_[RIGHT] = (int)(right_encoder_counts - last_encoder_counts_[RIGHT]);
+    encoder_counts_right_tmp = (int)(right_encoder_counts - last_encoder_counts_[RIGHT]);
 
-    if (encoder_counts_[RIGHT] > SPARKBASE_MAX_ENCODER_COUNTS / 10)
-      encoder_counts_[RIGHT] = encoder_counts_[RIGHT] - SPARKBASE_MAX_ENCODER_COUNTS;
-    if (encoder_counts_[RIGHT] < -SPARKBASE_MAX_ENCODER_COUNTS / 10)
-      encoder_counts_[RIGHT] = SPARKBASE_MAX_ENCODER_COUNTS + encoder_counts_[RIGHT];
+    if (encoder_counts_right_tmp > SPARKBASE_MAX_ENCODER_COUNTS / 10)
+      encoder_counts_right_tmp = encoder_counts_right_tmp - SPARKBASE_MAX_ENCODER_COUNTS;
+    if (encoder_counts_right_tmp < -SPARKBASE_MAX_ENCODER_COUNTS / 10)
+      encoder_counts_right_tmp = SPARKBASE_MAX_ENCODER_COUNTS + encoder_counts_right_tmp;
   }
   /*static double rc_count = 0;
       rc_count +=   encoder_counts_[RIGHT];
     std::cout<<"sum rec:"<<rc_count<<rc_count*SPARKBASE_PULSES_TO_M<<std::endl;*/
-  last_encoder_counts_[RIGHT] = right_encoder_counts;
+    if(abs(encoder_counts_right_tmp) < 1000)
+    {
+        encoder_counts_[RIGHT] = encoder_counts_right_tmp;
+        last_encoder_counts_[RIGHT] = right_encoder_counts;
+    }
+    else {
+        printf("Right Encoder: %d,%d,%d\n",
+        right_encoder_counts,last_encoder_counts_[RIGHT],right_encoder_counts-last_encoder_counts_[RIGHT]);
+
+    }
   //    printf("Right Encoder: %d\n", encoder_counts_[RIGHT]);
   return 0;
 }
 
 int nxsparkbase::OpenInterface::parseLeftEncoderCounts(unsigned char *buffer, int index)
 {
+    int encoder_counts_left_tmp;
+
   // Left encoder counts
   unsigned int left_encoder_counts = buffer2unsigned_int(buffer, index);
   left_encoder_counts = -left_encoder_counts;
-  //    printf("Left Encoder: %d,%d,%d\n", left_encoder_counts,
-  //    last_encoder_counts_[LEFT],left_encoder_counts-last_encoder_counts_[LEFT]);
+ //     printf("Left Encoder: %d,%d,%d\n", left_encoder_counts,
+ //     last_encoder_counts_[LEFT],left_encoder_counts-last_encoder_counts_[LEFT]);
 
   if (is_first_time_left ||
       left_encoder_counts == last_encoder_counts_[LEFT])  // First time, we need 2 to make it work!
   {
-    encoder_counts_[LEFT] = 0;
+    encoder_counts_left_tmp = 0;
     is_first_time_left = false;
   }
   else
   {
-    encoder_counts_[LEFT] = (int)(left_encoder_counts - last_encoder_counts_[LEFT]);
+    encoder_counts_left_tmp = (int)(left_encoder_counts - last_encoder_counts_[LEFT]);
 
-    if (encoder_counts_[LEFT] > SPARKBASE_MAX_ENCODER_COUNTS / 10)
-      encoder_counts_[LEFT] = encoder_counts_[LEFT] - SPARKBASE_MAX_ENCODER_COUNTS;
-    if (encoder_counts_[LEFT] < -SPARKBASE_MAX_ENCODER_COUNTS / 10)
-      encoder_counts_[LEFT] = SPARKBASE_MAX_ENCODER_COUNTS + encoder_counts_[LEFT];
+    if (encoder_counts_left_tmp > SPARKBASE_MAX_ENCODER_COUNTS / 10)
+      encoder_counts_left_tmp = encoder_counts_left_tmp - SPARKBASE_MAX_ENCODER_COUNTS;
+    if (encoder_counts_left_tmp < -SPARKBASE_MAX_ENCODER_COUNTS / 10)
+      encoder_counts_left_tmp = SPARKBASE_MAX_ENCODER_COUNTS + encoder_counts_left_tmp;
   }
-
-  last_encoder_counts_[LEFT] = left_encoder_counts;
+  if(abs(encoder_counts_left_tmp) < 1000)
+  {
+        encoder_counts_[LEFT] = encoder_counts_left_tmp;
+        last_encoder_counts_[LEFT] = left_encoder_counts;
+  }
+  else {
+      printf("Left Encoder: %d,%d,%d\n", left_encoder_counts,
+      last_encoder_counts_[LEFT],left_encoder_counts-last_encoder_counts_[LEFT]);
+  }
   //    printf("Left Encoder: %d\n", encoder_counts_[LEFT]);
   return 0;
 }
