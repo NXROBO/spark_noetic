@@ -50,9 +50,9 @@ catkin_make
 <a href="https://www.youtube.com/embed/UrD2AEQ3VkI" target="_blank"><img src="http://img.youtube.com/vi/UrD2AEQ3VkI/0.jpg" 
 alt="follow-person" width="240" height="180" border="10" /></a>
 ```yaml
-cd spark
+cd ~/spark_noetic
 source devel/setup.bash
-roslaunch spark_follower bringup.launch
+roslaunch spark_follower bringup.launch camera_type_tel:=d435
 ```
 
 2.Spark建图 Spark-SLAM-Mapping
@@ -60,9 +60,9 @@ roslaunch spark_follower bringup.launch
 <a href="https://www.youtube.com/embed/Yt9Sld-EX0s" target="_blank"><img src="http://img.youtube.com/vi/Yt9Sld-EX0s/0.jpg" 
 alt="follow-person" width="240" height="180" border="10" /></a>
 ```yaml
-cd spark
+cd ~/spark_noetic
 source devel/setup.bash
-roslaunch spark_slam 2d_slam_teleop.launch slam_methods_tel:=gmapping
+roslaunch spark_slam 2d_slam_teleop.launch slam_methods_tel:=gmapping camera_type_tel:=d435 lidar_type_tel:=ydlidar_g6
 ```
 
 3.Spark导航 Spark-Navigation
@@ -70,9 +70,9 @@ roslaunch spark_slam 2d_slam_teleop.launch slam_methods_tel:=gmapping
 <a href="https://www.youtube.com/embed/3RP11sZKfJg" target="_blank"><img src="http://img.youtube.com/vi/3RP11sZKfJg/0.jpg" 
 alt="follow-person" width="240" height="180" border="10" /></a>
 ```yaml
-cd spark
+cd ~/spark_noetic
 source devel/setup.bash
-roslaunch spark_navigation amcl_demo_lidar_rviz.launch
+roslaunch spark_navigation amcl_demo_lidar_rviz.launch camera_type_tel:=d435 lidar_type_tel:=ydlidar_g6
 ```
 
 4.Spark-RtabMap建图 Spark-RtabMap-Mapping
@@ -80,9 +80,9 @@ roslaunch spark_navigation amcl_demo_lidar_rviz.launch
 <a href="https://www.youtube.com/embed/K5wvlWb-2uQ" target="_blank"><img src="http://img.youtube.com/vi/K5wvlWb-2uQ/0.jpg" 
 alt="follow-person" width="240" height="180" border="10" /></a>
 ```yaml
-cd spark
+cd ~/spark_noetic
 source devel/setup.bash
-roslaunch spark_rtabmap spark_rtabmap_teleop.launch 
+roslaunch spark_rtabmap spark_rtabmap_teleop.launch camera_type_tel:=d435
 ```
 
 5.Spark机械臂视觉抓取 Spark-Carry_Object
@@ -90,9 +90,9 @@ roslaunch spark_rtabmap spark_rtabmap_teleop.launch
 <a href="https://www.youtube.com/embed/aNPy6GYcdu0" target="_blank"><img src="http://img.youtube.com/vi/aNPy6GYcdu0/0.jpg" 
 alt="follow-person" width="240" height="180" border="10" /></a>
 ```yaml
-cd spark
+cd ~/spark_noetic
 source devel/setup.bash
-roslaunch spark_carry_object spark_carry_object_only_cv3.launch 
+roslaunch spark_carry_object spark_carry_object_only_cv3.launch camera_type_tel:=d435 lidar_type_tel:=ydlidar_g6
 ```
 
 
