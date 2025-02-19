@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2016, NXROBO Ltd.
+ *  Copyright (c) 2016 ~ 2025 NXROBO Ltd.
  *  litian.zhuang <litian.zhuang@nxrobo.com>
  *
  *  All rights reserved.
